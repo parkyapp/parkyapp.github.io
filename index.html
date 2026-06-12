@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+   <meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Parky</title>
@@ -8,6 +14,52 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+
+    html,
+body {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+    .screen {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all .3s ease;
+  pointer-events: none;
+}
+
+.screen.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+    html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.phone {
+  overflow: hidden;
+}
+
+.screen {
+  overflow: hidden;
+}
+.h-scroll,
+.spend-scroll,
+.bottom-sheet {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+* {
+  box-sizing: border-box;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;font-family:'Inter',sans-serif}
 .phone{width:390px;height:844px;background:#F2F2F2;border-radius:52px;position:relative;border:1px solid #C8C8C8;box-shadow:0 40px 80px rgba(0,0,0,0.2),0 0 0 1px rgba(255,255,255,0.5) inset}
