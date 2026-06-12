@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"><title>Parky</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Parky</title>
+
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#ffffff">
 <link rel="apple-touch-icon" href="/icon-512.png">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -35,7 +38,6 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .nav-orb.current .nav-orb-label{color:rgba(255,255,255,.6)}
 .nav-orb svg{width:22px;height:22px;stroke:rgba(0,0,0,.6);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .nav-orb-label{font-size:9px;font-weight:700;color:rgba(0,0,0,.45);text-transform:uppercase;letter-spacing:.05em}
-/* Bottom sheet base */
 .sheet-backdrop{position:absolute;inset:0;border-radius:52px;background:rgba(0,0,0,.35);z-index:60;display:none;backdrop-filter:blur(4px)}
 .sheet-backdrop.active{display:block}
 .bottom-sheet{position:absolute;bottom:0;left:0;right:0;background:#F5F5F5;border-radius:28px 28px 0 0;z-index:61;transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.1,.64,1);visibility:hidden;pointer-events:none;max-height:90%;overflow-y:auto;scrollbar-width:none}
@@ -49,7 +51,6 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .f-section{padding:0 20px;margin-bottom:20px}
 .f-label{font-size:11px;font-weight:700;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
 .apply-btn{margin:4px 20px 0;padding:16px;background:#0A0A0A;border:none;border-radius:16px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:'Inter',sans-serif;width:calc(100% - 40px)}
-/* HOME */
 #home{padding:0 20px 160px}
 .greeting-sub{font-size:13px;color:rgba(0,0,0,.42);margin-bottom:3px}
 .greeting-name{font-size:36px;font-weight:800;color:#0A0A0A;letter-spacing:-1.2px;line-height:1}
@@ -77,7 +78,6 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .see-all{font-size:12px;color:rgba(0,0,0,.4);cursor:pointer}
 .hist-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.85);border:0.5px solid rgba(255,255,255,.98);border-radius:18px;margin-bottom:9px;cursor:pointer}
 .hist-icon{width:44px;height:44px;background:rgba(0,0,0,.05);border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-/* SAVE FLOW */
 #saveFlow{padding:0 20px 30px}
 .save-input{width:100%;padding:14px 16px;background:rgba(255,255,255,.9);border:0.5px solid rgba(0,0,0,.1);border-radius:14px;font-size:15px;font-family:'Inter',sans-serif;color:#0A0A0A;outline:none;margin-bottom:12px}
 .save-input:focus{border-color:rgba(0,0,0,.3)}
@@ -86,7 +86,6 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .s-opt.active{background:#0A0A0A;color:#fff;border-color:#0A0A0A}
 .s-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
 .s-lbl{font-size:11px;font-weight:700;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;margin-top:12px}
-/* HISTORY */
 #history{background:#F2F2F2}
 .h-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;border-radius:52px}
 .h-scroll::-webkit-scrollbar{display:none}
@@ -98,7 +97,6 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .h-chevron{transition:transform .2s;flex-shrink:0}
 .h-card.open .h-chevron{transform:rotate(180deg)}
 .active-card{border-color:rgba(34,197,94,.2)!important}
-/* SPEND */
 #spend{background:#F2F2F2}
 .spend-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;border-radius:52px}
 .spend-scroll::-webkit-scrollbar{display:none}
@@ -109,7 +107,6 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .txn-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:0.5px solid rgba(0,0,0,.06)}
 .txn-row:last-child{border-bottom:none}
 .txn-icon{width:40px;height:40px;background:rgba(0,0,0,.05);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-/* MAP */
 #map{background:#E8E8E8}
 .map-wrap{position:absolute;inset:0;border-radius:52px;overflow:hidden}
 #leaflet-map{position:absolute;inset:0;z-index:1}
@@ -117,7 +114,6 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .map-card-overlay{background:rgba(255,255,255,.96);border:0.5px solid rgba(255,255,255,1);border-radius:20px;backdrop-filter:blur(16px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
 .map-bottom{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 16px 40px}
 .map-recenter-btn{position:absolute;bottom:210px;right:16px;width:44px;height:44px;background:rgba(255,255,255,.95);border:0.5px solid rgba(255,255,255,1);border-radius:12px;backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,.1)}
-/* SETTINGS */
 #settings{padding:0 0 100px}
 .top-nav{display:flex;justify-content:center;align-items:center;padding:16px 24px;position:relative}
 .back-btn{position:absolute;left:24px;width:36px;height:36px;background:rgba(255,255,255,.85);border:0.5px solid rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -136,7 +132,7 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .theme-toggle{display:flex;background:rgba(0,0,0,.06);border-radius:100px;padding:3px;gap:2px}
 .theme-opt{padding:5px 14px;border-radius:100px;font-size:12px;font-weight:600;color:rgba(0,0,0,.4);cursor:pointer;transition:all .2s}
 .theme-opt.active{background:#0A0A0A;color:#fff}
-/* DARK MODE */
+
 body.dark{background:#1a1a1a}
 body.dark .phone{background:#0A0A0A;border-color:#333}
 body.dark .screen{background:#0A0A0A}
@@ -156,50 +152,38 @@ body.dark .s-card,body.dark .profile-card{background:rgba(255,255,255,.05);borde
 body.dark #settings,body.dark #home,body.dark #history,body.dark #spend{background:#0A0A0A}
 body.dark .h-card{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
 body.dark .save-circle{box-shadow:0 12px 36px rgba(0,0,0,.6)}
-body.dark .h-scroll{background:#0A0A0A}
-body.dark .spend-scroll{background:#0A0A0A}
+body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
+
 /* ══ MOBILE & PWA FULLSCREEN FIXED ══ */
 @media (max-width: 480px), (display-mode: standalone) {
   body {
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
+    display: block; /* Removes flex issues causing top cut-offs */
     background: #F2F2F2;
     overflow: hidden;
-    height: 100vh;
-    height: -webkit-fill-available;
+    height: 100vh; /* Fallback */
+    height: 100dvh; /* Modern mobile viewport height */
   }
 
-  body.dark {
-    background: #0A0A0A;
-  }
+  body.dark { background: #0A0A0A; }
 
-  /* Make the main phone wrapper fill the native viewport perfectly */
   .phone {
     width: 100vw;
-    height: 100% !important; /* Forces it to fill the flex body */
+    height: 100vh; 
+    height: 100dvh;
     border-radius: 0;
     border: none;
     box-shadow: none;
-    display: flex;
-    flex-direction: column;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    position: absolute;
+    inset: 0;
+    /* Respect hardware notches and home swipe bars */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   /* Ensure the active screens don't overflow layout limits */
-  .screen {
-    position: relative; /* Change from absolute to sit comfortably below status bar */
-    flex: 1;
-    height: auto;
-    border-radius: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
+  .screen, 
   .nav-overlay, 
   .h-scroll, 
   .spend-scroll,
@@ -207,24 +191,14 @@ body.dark .spend-scroll{background:#0A0A0A}
     border-radius: 0;
   }
 
-  /* Adjust the floating navigation background to match fullscreen screens */
   .nav-overlay {
     position: fixed;
     inset: 0;
   }
 
-  /* Reposition navigation orbs relative to dynamic fullscreen width */
-  .nav-orb {
-    position: fixed !important;
-  }
-
+  /* Essential for fixed bottom sheets not getting hidden by iOS/Android swipe bars */
   .bottom-sheet {
     padding-bottom: env(safe-area-inset-bottom, 20px);
-  }
-
-  /* Fixes the layout spacing for the top greeting row on mobile devices */
-  .top-row {
-    margin-top: 10px;
   }
 }
 </style>
@@ -232,7 +206,6 @@ body.dark .spend-scroll{background:#0A0A0A}
 <body>
 <div class="phone" id="phone">
 
-<!-- ══ HOME ══ -->
 <div class="screen active" id="home">
   <div class="status-bar"><span id="homeTime">9:41</span><div class="status-right"><svg width="16" height="11" viewBox="0 0 16 11" fill="none"><rect x="0" y="4" width="3" height="7" rx=".8" fill="#0A0A0A"/><rect x="4.5" y="2.5" width="3" height="8.5" rx=".8" fill="#0A0A0A"/><rect x="9" y=".5" width="3" height="10.5" rx=".8" fill="#0A0A0A"/><rect x="13.5" y="0" width="2.5" height="11" rx=".8" fill="rgba(0,0,0,0.15)"/></svg><svg width="15" height="11" viewBox="0 0 15 11" fill="none"><path d="M7.5 2.2C9.8 2.2 11.9 3.1 13.4 4.6L14.8 3.2C12.9 1.2 10.3 0 7.5 0C4.7 0 2.1 1.2 .2 3.2L1.6 4.6C3.1 3.1 5.2 2.2 7.5 2.2Z" fill="#0A0A0A"/><path d="M7.5 5.5C9 5.5 10.3 6.1 11.3 7L12.7 5.6C11.3 4.3 9.5 3.5 7.5 3.5C5.5 3.5 3.7 4.3 2.3 5.6L3.7 7C4.7 6.1 6 5.5 7.5 5.5Z" fill="#0A0A0A"/><circle cx="7.5" cy="9.5" r="1.5" fill="#0A0A0A"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="rgba(0,0,0,0.35)" stroke-width=".8"/><rect x="1.5" y="1.5" width="17" height="9" rx="2.5" fill="#0A0A0A"/><path d="M23 4v4a2 2 0 000-4z" fill="rgba(0,0,0,0.4)"/></svg></div></div>
   <div class="top-row">
@@ -246,7 +219,6 @@ body.dark .spend-scroll{background:#0A0A0A}
     <p class="save-title">Save My Spot</p>
     <p class="save-sub">Tap to record your parking location</p>
   </div>
-  <!-- Active session (shown when parked) -->
   <div id="activeCard" style="display:none">
     <div class="glass24 session-card" style="margin-bottom:14px">
       <div class="session-top">
@@ -272,7 +244,6 @@ body.dark .spend-scroll{background:#0A0A0A}
   <div id="recentList"></div>
 </div>
 
-<!-- ══ SAVE FLOW ══ -->
 <div class="sheet-backdrop" id="saveBackdrop" onclick="closeSave()"></div>
 <div class="bottom-sheet" id="saveSheet">
   <div class="sheet-handle"></div>
@@ -311,7 +282,6 @@ body.dark .spend-scroll{background:#0A0A0A}
   </div>
 </div>
 
-<!-- ══ HISTORY ══ -->
 <div class="screen" id="history">
   <div class="sheet-backdrop" id="histFilterBackdrop" onclick="closeHistFilter()"></div>
   <div class="bottom-sheet" id="histFilterSheet">
@@ -340,7 +310,6 @@ body.dark .spend-scroll{background:#0A0A0A}
         <div onclick="openHistFilter()" style="height:38px;padding:0 14px;background:rgba(255,255,255,.85);border:0.5px solid rgba(255,255,255,.95);border-radius:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span style="font-size:12px;font-weight:600;color:rgba(0,0,0,.55)">Filter</span></div>
       </div>
     </div>
-    <!-- Summary -->
     <div style="padding:0 20px;margin-bottom:20px">
       <div class="glass" style="padding:16px 20px;display:flex;border-radius:18px">
         <div style="flex:1;text-align:center;border-right:0.5px solid rgba(0,0,0,.07)"><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.32);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Sessions</p><p style="font-size:22px;font-weight:800;color:#0A0A0A" id="hSessions">0</p></div>
@@ -348,7 +317,6 @@ body.dark .spend-scroll{background:#0A0A0A}
         <div style="flex:1;text-align:center"><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.32);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Spent</p><p style="font-size:22px;font-weight:800;color:#0A0A0A" id="hSpent">$0</p></div>
       </div>
     </div>
-    <!-- Calendar view -->
     <div id="calView" style="display:none;padding:0 20px;margin-bottom:20px">
       <div class="glass" style="padding:18px;border-radius:20px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -362,12 +330,10 @@ body.dark .spend-scroll{background:#0A0A0A}
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center" id="calGrid"></div>
       </div>
     </div>
-    <!-- List -->
     <div id="histList" style="padding:0 20px 160px"></div>
   </div>
 </div>
 
-<!-- ══ SPEND ══ -->
 <div class="screen" id="spend">
   <div class="sheet-backdrop" id="spendFilterBackdrop" onclick="closeSpendFilter()"></div>
   <div class="bottom-sheet" id="spendFilterSheet">
@@ -396,7 +362,6 @@ body.dark .spend-scroll{background:#0A0A0A}
         </div>
         <div onclick="openSpendFilter()" style="width:42px;height:42px;background:rgba(255,255,255,.9);border:0.5px solid rgba(255,255,255,.98);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(20px);flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
       </div>
-      <!-- Hero -->
       <div class="glass24" style="padding:24px;margin-bottom:14px">
         <p style="font-size:12px;font-weight:600;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Total Spent</p>
         <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px">
@@ -409,17 +374,14 @@ body.dark .spend-scroll{background:#0A0A0A}
         <svg width="100%" height="48" viewBox="0 0 310 48" preserveAspectRatio="none" style="display:block;margin-bottom:4px"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0A0A0A" stop-opacity=".12"/><stop offset="100%" stop-color="#0A0A0A" stop-opacity="0"/></linearGradient></defs><path id="sparkPath" d="M0 38 L310 38" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-linecap="round"/><path id="sparkFill" d="M0 38 L310 38 L310 48 L0 48Z" fill="url(#sg)"/></svg>
         <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:rgba(0,0,0,.28)" id="sStart">--</span><span style="font-size:10px;color:rgba(0,0,0,.28)" id="sEnd">--</span></div>
       </div>
-      <!-- Stats -->
       <div style="display:flex;gap:10px;margin-bottom:14px">
         <div class="glass" style="flex:1;padding:14px 16px;border-radius:18px"><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.32);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Avg / Session</p><p style="font-size:22px;font-weight:800;color:#0A0A0A;letter-spacing:-.5px" id="spendAvg">$0.00</p><p style="font-size:11px;color:rgba(0,0,0,.35);margin-top:3px" id="spendCount">0 sessions</p></div>
         <div class="glass" style="flex:1;padding:14px 16px;border-radius:18px"><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.32);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Most Visited</p><p style="font-size:15px;font-weight:700;color:#0A0A0A;letter-spacing:-.2px;line-height:1.2" id="spendMost">—</p><p style="font-size:11px;color:rgba(0,0,0,.35);margin-top:3px" id="spendMostCount"></p></div>
       </div>
-      <!-- Breakdown -->
       <div class="glass24" style="padding:20px;margin-bottom:14px">
         <p style="font-size:13px;font-weight:700;color:#0A0A0A;margin-bottom:16px">By Payment Method</p>
         <div id="payBreakdown"></div>
       </div>
-      <!-- Transactions -->
       <div class="glass24" style="padding:20px;margin-bottom:140px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><p style="font-size:13px;font-weight:700;color:#0A0A0A">Recent Transactions</p><p style="font-size:12px;color:rgba(0,0,0,.38);cursor:pointer" onclick="navigate('history')">See all</p></div>
         <div id="txnList"></div>
@@ -428,7 +390,6 @@ body.dark .spend-scroll{background:#0A0A0A}
   </div>
 </div>
 
-<!-- ══ MAP ══ -->
 <div class="screen" id="map">
   <div class="map-wrap">
     <div id="leaflet-map"></div>
@@ -463,7 +424,6 @@ body.dark .spend-scroll{background:#0A0A0A}
   </div>
 </div>
 
-<!-- ══ SETTINGS ══ -->
 <div class="screen" id="settings">
   <div class="status-bar" style="margin-bottom:16px"><span>9:41</span><div class="status-right"><svg width="16" height="11" viewBox="0 0 16 11" fill="none"><rect x="0" y="4" width="3" height="7" rx=".8" fill="#0A0A0A"/><rect x="4.5" y="2.5" width="3" height="8.5" rx=".8" fill="#0A0A0A"/><rect x="9" y=".5" width="3" height="10.5" rx=".8" fill="#0A0A0A"/><rect x="13.5" y="0" width="2.5" height="11" rx=".8" fill="rgba(0,0,0,0.15)"/></svg></div></div>
   <div class="top-nav"><div class="back-btn" onclick="navigate('home')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div><span style="font-size:16px;font-weight:600;color:#0A0A0A">Settings</span></div>
@@ -500,7 +460,6 @@ body.dark .spend-scroll{background:#0A0A0A}
   <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0 40px"><p style="font-size:16px;font-weight:800;color:rgba(0,0,0,.18);letter-spacing:-.5px">Parky</p><p style="font-size:11px;color:rgba(0,0,0,.2)">Version 1.0.0</p></div>
 </div>
 
-<!-- FAB -->
 <div class="fab" id="fab"><svg width="22" height="16" viewBox="0 0 22 16" fill="none"><rect width="22" height="2.2" rx="1.1" fill="white"/><rect y="6.9" width="22" height="2.2" rx="1.1" fill="white"/><rect y="13.8" width="22" height="2.2" rx="1.1" fill="white"/></svg></div>
 <div class="nav-overlay" id="navOverlay"></div>
 <div class="nav-orb" data-screen="home"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nav-orb-label">Home</span></div>
@@ -511,6 +470,15 @@ body.dark .spend-scroll{background:#0A0A0A}
 
 </div>
 <script>
+// ── PWA SERVICE WORKER REGISTRATION ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.error('SW failed:', err));
+  });
+}
+
 // ── DATA MODEL ──
 function getSessions(){try{return JSON.parse(localStorage.getItem('parky_sessions'))||[]}catch{return[]}}
 function saveSessions(s){localStorage.setItem('parky_sessions',JSON.stringify(s))}
@@ -520,43 +488,35 @@ function clearActive(){localStorage.removeItem('parky_active')}
 function getPrefs(){try{return JSON.parse(localStorage.getItem('parky_prefs'))||{theme:'light',notif:true}}catch{return{theme:'light',notif:true}}}
 function savePrefs(p){localStorage.setItem('parky_prefs',JSON.stringify(p))}
 
-// ── PWA SERVICE WORKER REGISTRATION ──
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('Service Worker registered with scope:', registration.scope);
-      })
-      .catch(error => {
-        console.error('Service Worker registration failed:', error);
-      });
-  });
-}
-
-// ── NAV ──
-const fab=document.getElementById('fab'),navOverlay=document.getElementById('navOverlay'),orbs=document.querySelectorAll('.nav-orb');
-let open=false,currentScreen='home';
 // ── DYNAMIC RESPONSIVE NAV ──
-let PW = window.innerWidth <= 480 ? window.innerWidth : 390;
-let PH = window.innerWidth <= 480 ? window.innerHeight : 844;
-let cx = PW / 2, cy = PH / 2;
-let fabRX = PW - 24 - 29, fabRY = PH - 36 - 29;
+const fab = document.getElementById('fab'), navOverlay = document.getElementById('navOverlay'), orbs = document.querySelectorAll('.nav-orb');
+let open = false, currentScreen = 'home';
+let PW, PH, cx, cy, fabRX, fabRY;
 const radius = 145, count = orbs.length;
 
 function layoutOrbs() {
-  PW = window.innerWidth <= 480 ? window.innerWidth : 390;
-  PH = window.innerWidth <= 480 ? window.innerHeight : 844;
-  cx = PW / 2; cy = PH / 2;
-  fabRX = PW - 24 - 29; fabRY = PH - 36 - 29;
-  
+  const isMobile = window.innerWidth <= 480 || window.matchMedia('(display-mode: standalone)').matches;
+  PW = isMobile ? window.innerWidth : 390;
+  PH = isMobile ? window.innerHeight : 844;
+  cx = PW / 2;
+  cy = PH / 2;
+  fabRX = PW - 24 - 29; // 29 is half of 58 (fab width)
+  fabRY = PH - 36 - 29;
+
   orbs.forEach((o, i) => {
     const a = -90 + (360 / count) * i, r = a * Math.PI / 180;
     o.style.left = (cx + radius * Math.cos(r) - 35) + 'px';
     o.style.top = (cy + radius * Math.sin(r) - 35) + 'px';
   });
+  
+  // Re-adjust FAB position dynamically if the menu is already open
+  if (open) {
+    fab.style.transform = `translate(${cx - fabRX}px, ${cy - fabRY}px)`;
+  }
 }
 layoutOrbs();
 window.addEventListener('resize', layoutOrbs);
+
 function navigate(screen){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const t=document.getElementById(screen);if(t){t.classList.add('active');t.scrollTop=0}
@@ -566,8 +526,24 @@ function navigate(screen){
   if(screen==='map'){setTimeout(()=>{initMap();if(mapInstance)mapInstance.invalidateSize()},150);updateMapCard()}
   if(screen==='settings')updateSettings();
 }
-function openNav(){open=true;fab.style.transform=`translate(${cx-fabRX}px,${cy-fabRY}px)`;fab.classList.add('open');navOverlay.classList.add('active');orbs.forEach(o=>o.classList.toggle('current',o.dataset.screen===currentScreen));orbs.forEach((o,i)=>{o.style.transitionDelay=(i*.06)+'s';setTimeout(()=>o.classList.add('visible'),20)})}
-function closeNav(){open=false;fab.style.transform='';fab.classList.remove('open');orbs.forEach((o,i)=>{o.style.transitionDelay=((count-1-i)*.04)+'s';o.classList.remove('visible')});setTimeout(()=>navOverlay.classList.remove('active'),300)}
+
+function openNav(){
+  open=true;
+  fab.style.transform=`translate(${cx-fabRX}px,${cy-fabRY}px)`;
+  fab.classList.add('open');
+  navOverlay.classList.add('active');
+  orbs.forEach(o=>o.classList.toggle('current',o.dataset.screen===currentScreen));
+  orbs.forEach((o,i)=>{o.style.transitionDelay=(i*.06)+'s';setTimeout(()=>o.classList.add('visible'),20)});
+}
+
+function closeNav(){
+  open=false;
+  fab.style.transform='';
+  fab.classList.remove('open');
+  orbs.forEach((o,i)=>{o.style.transitionDelay=((count-1-i)*.04)+'s';o.classList.remove('visible')});
+  setTimeout(()=>navOverlay.classList.remove('active'),300);
+}
+
 fab.addEventListener('click',()=>open?closeNav():openNav());
 navOverlay.addEventListener('click',closeNav);
 orbs.forEach(o=>o.addEventListener('click',()=>navigate(o.dataset.screen)));
@@ -610,7 +586,6 @@ function confirmSave(){
   const session={id:Date.now(),location:addr,spot,payment:pay,cost,notes,timerMins,startTime:Date.now(),lat:null,lng:null};
   if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{session.lat=p.coords.latitude;session.lng=p.coords.longitude;setActive(session);closeSave();refreshHome()},()=>{setActive(session);closeSave();refreshHome()})}
   else{setActive(session);closeSave();refreshHome()}
-  // Flash circle green
   const c=document.getElementById('saveCircle');c.style.background='#22C55E';setTimeout(()=>c.style.background='#0A0A0A',1200);
 }
 
@@ -619,15 +594,12 @@ let timerInterval=null;
 function refreshHome(){
   const active=getActive();
   const sessions=getSessions();
-  // Recent list
   const rl=document.getElementById('recentList');
   const recent=sessions.slice(-3).reverse();
   if(recent.length===0){rl.innerHTML='<p style="font-size:13px;color:rgba(0,0,0,.35);text-align:center;padding:20px 0">No sessions yet</p>'}
   else{rl.innerHTML=recent.map(s=>`<div class="hist-row"><div class="hist-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="1.7" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:600;color:#0A0A0A;margin-bottom:3px">${s.location}</p><p style="font-size:12px;color:rgba(0,0,0,.38)">${fmtDate(s.startTime)} · ${fmtDur(s.duration||0)} · ${s.payment}</p></div><div style="text-align:right"><p style="font-size:14px;font-weight:700;color:#0A0A0A">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p></div></div>`).join('')}
-  // Active card
   if(active){
     document.getElementById('activeCard').style.display='block';
-    document.getElementById('saveSection') && (document.getElementById('saveSection').style.marginBottom='14px');
     document.getElementById('activeLocation').textContent=active.location;
     document.getElementById('activeDetail').textContent=`${active.spot||'No spot noted'} · ${active.payment}`;
     if(timerInterval)clearInterval(timerInterval);
@@ -681,8 +653,8 @@ function endSession(){
 function navigateToCar(){
   const active=getActive();
   if(!active)return;
-  if(active.lat&&active.lng){window.open(`https://maps.google.com/?q=${active.lat},${active.lng}`)}
-  else{window.open(`https://maps.google.com/?q=${encodeURIComponent(active.location)}`)}
+  if(active.lat&&active.lng){window.open(`http://maps.google.com/maps?daddr=${active.lat},${active.lng}`)}
+  else{window.open(`http://maps.google.com/maps?q=${encodeURIComponent(active.location)}`)}
 }
 
 // ── HISTORY ──
@@ -717,13 +689,11 @@ function buildCalendar(){
 }
 function renderHistory(){
   const sessions=getSessions().slice().reverse();const active=getActive();
-  // Stats
   const total=sessions.reduce((a,s)=>a+s.cost,0);
   const totalHrs=sessions.reduce((a,s)=>a+(s.duration||0)/3600,0);
   document.getElementById('hSessions').textContent=sessions.length+(active?1:0);
   document.getElementById('hHours').textContent=totalHrs.toFixed(1);
   document.getElementById('hSpent').textContent='$'+total.toFixed(0);
-  // List
   const hl=document.getElementById('histList');
   let html='';
   if(active){html+=`<p style="font-size:11px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Active</p>${histCard(active,true)}`}
@@ -731,7 +701,6 @@ function renderHistory(){
   html+=sessions.map(s=>histCard(s,false)).join('');
   hl.innerHTML=html;
   hl.querySelectorAll('.h-card').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('open')));
-  document.getElementById('hSessions').textContent=sessions.length+(active?1:0);
 }
 function histCard(s,isActive){
   const badge=isActive?`<span style="font-size:9px;font-weight:700;color:#16A34A;background:rgba(34,197,94,.1);border:0.5px solid rgba(34,197,94,.25);border-radius:20px;padding:2px 7px;margin-left:6px">ACTIVE</span>`:(s.cost===0?`<span style="font-size:9px;color:rgba(0,0,0,.35)">Free</span>`:`<span style="font-size:9px;font-weight:600;color:#DC2626;background:rgba(239,68,68,.08);border:0.5px solid rgba(239,68,68,.2);border-radius:20px;padding:2px 7px">ENDED</span>`);
@@ -756,12 +725,10 @@ function renderSpend(period){
   document.getElementById('spendTotal').textContent='$'+total.toFixed(2);
   document.getElementById('spendAvg').textContent='$'+avg.toFixed(2);
   document.getElementById('spendCount').textContent=filtered.length+' sessions';
-  // Most visited
   const locCount={};filtered.forEach(s=>{locCount[s.location]=(locCount[s.location]||0)+1});
   const top=Object.entries(locCount).sort((a,b)=>b[1]-a[1])[0];
   document.getElementById('spendMost').textContent=top?top[0].split(' ').slice(0,2).join(' '):'—';
   document.getElementById('spendMostCount').textContent=top?top[1]+' visits':'';
-  // Trend label
   const half=period==='week'?7*86400000/2:period==='month'?15*86400000:Infinity;
   const recent2=allSessions.filter(s=>now-s.startTime<half).reduce((a,s)=>a+s.cost,0);
   const older=allSessions.filter(s=>now-s.startTime>=half&&now-s.startTime<(half*2)).reduce((a,s)=>a+s.cost,0);
@@ -770,11 +737,9 @@ function renderSpend(period){
   document.getElementById('trendArrow').setAttribute('points',up?'18 15 12 9 6 15':'6 9 12 15 18 9');
   document.getElementById('trendTxt').style.color=up?'#16A34A':'#DC2626';
   document.getElementById('trendBadge').style.background=up?'rgba(34,197,94,.1)':'rgba(239,68,68,.08)';
-  // Period labels
   const labels={week:['Mon','Today'],month:['Jun 1','Today'],all:['Start','Today']};
   document.getElementById('sStart').textContent=labels[period][0];
   document.getElementById('sEnd').textContent=labels[period][1];
-  // Pay breakdown
   const pays={Cash:0,Card:0,App:0};filtered.forEach(s=>{if(pays[s.payment]!==undefined)pays[s.payment]+=s.cost});
   const payTotal=Object.values(pays).reduce((a,b)=>a+b,0)||1;
   document.getElementById('payBreakdown').innerHTML=Object.entries(pays).map(([k,v])=>`
@@ -785,7 +750,6 @@ function renderSpend(period){
       </div>
       <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/payTotal*100)}%"></div></div>
     </div>`).join('');
-  // Transactions
   const txns=filtered.slice().reverse().slice(0,5);
   document.getElementById('txnList').innerHTML=txns.length?txns.map(s=>`<div class="txn-row"><div class="txn-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.45)" stroke-width="1.7" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div style="flex:1"><p style="font-size:13px;font-weight:600;color:#0A0A0A;margin-bottom:2px">${s.location}</p><p style="font-size:11px;color:rgba(0,0,0,.38)">${fmtDate(s.startTime)} · ${s.payment}</p></div><p style="font-size:14px;font-weight:700;color:#0A0A0A">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p></div>`).join(''):'<p style="font-size:13px;color:rgba(0,0,0,.35);text-align:center;padding:20px 0">No transactions yet</p>';
 }
@@ -857,7 +821,6 @@ function fmtDur(secs){if(!secs)return'Active';const h=Math.floor(secs/3600),m=Ma
 const prefs=getPrefs();
 if(prefs.theme==='dark')document.body.classList.add('dark');
 refreshHome();
-// Restore timer if session active
 const existingActive=getActive();
 if(existingActive&&!timerInterval){timerInterval=setInterval(()=>tickTimer(existingActive),1000);tickTimer(existingActive)}
 </script>
