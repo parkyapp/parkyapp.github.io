@@ -158,35 +158,48 @@ body.dark .h-card{background:rgba(255,255,255,.05);border-color:rgba(255,255,255
 body.dark .save-circle{box-shadow:0 12px 36px rgba(0,0,0,.6)}
 body.dark .h-scroll{background:#0A0A0A}
 body.dark .spend-scroll{background:#0A0A0A}
-/* ══ MOBILE & PWA FULLSCREEN FIX ══ */
+/* ══ MOBILE & PWA FULLSCREEN FIXED ══ */
 @media (max-width: 480px), (display-mode: standalone) {
-  /* Remove the grey background and padding from the body */
   body {
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
     align-items: stretch;
+    justify-content: flex-start;
     background: #F2F2F2;
-    overflow: hidden; /* Prevents the outer body from scrolling past the phone */
+    overflow: hidden;
+    height: 100vh;
+    height: -webkit-fill-available;
   }
 
   body.dark {
     background: #0A0A0A;
   }
 
-  /* Make the mock phone take up the exact size of the real screen */
+  /* Make the main phone wrapper fill the native viewport perfectly */
   .phone {
     width: 100vw;
-    height: 100vh;
+    height: 100% !important; /* Forces it to fill the flex body */
     border-radius: 0;
     border: none;
     box-shadow: none;
-    /* Respect hardware notches and home swipe bars */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  /* Remove border radius from the inner screens */
-  .screen, 
+  /* Ensure the active screens don't overflow layout limits */
+  .screen {
+    position: relative; /* Change from absolute to sit comfortably below status bar */
+    flex: 1;
+    height: auto;
+    border-radius: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .nav-overlay, 
   .h-scroll, 
   .spend-scroll,
@@ -194,9 +207,24 @@ body.dark .spend-scroll{background:#0A0A0A}
     border-radius: 0;
   }
 
-  /* Ensure bottom sheets respect the bottom screen edge */
+  /* Adjust the floating navigation background to match fullscreen screens */
+  .nav-overlay {
+    position: fixed;
+    inset: 0;
+  }
+
+  /* Reposition navigation orbs relative to dynamic fullscreen width */
+  .nav-orb {
+    position: fixed !important;
+  }
+
   .bottom-sheet {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+
+  /* Fixes the layout spacing for the top greeting row on mobile devices */
+  .top-row {
+    margin-top: 10px;
   }
 }
 </style>
@@ -508,8 +536,27 @@ if ('serviceWorker' in navigator) {
 // ── NAV ──
 const fab=document.getElementById('fab'),navOverlay=document.getElementById('navOverlay'),orbs=document.querySelectorAll('.nav-orb');
 let open=false,currentScreen='home';
-const PW=390,PH=844,cx=PW/2,cy=PH/2,fabRX=PW-24-29,fabRY=PH-36-29,radius=145,count=orbs.length;
-orbs.forEach((o,i)=>{const a=-90+(360/count)*i,r=a*Math.PI/180;o.style.left=(cx+radius*Math.cos(r)-35)+'px';o.style.top=(cy+radius*Math.sin(r)-35)+'px'});
+// ── DYNAMIC RESPONSIVE NAV ──
+let PW = window.innerWidth <= 480 ? window.innerWidth : 390;
+let PH = window.innerWidth <= 480 ? window.innerHeight : 844;
+let cx = PW / 2, cy = PH / 2;
+let fabRX = PW - 24 - 29, fabRY = PH - 36 - 29;
+const radius = 145, count = orbs.length;
+
+function layoutOrbs() {
+  PW = window.innerWidth <= 480 ? window.innerWidth : 390;
+  PH = window.innerWidth <= 480 ? window.innerHeight : 844;
+  cx = PW / 2; cy = PH / 2;
+  fabRX = PW - 24 - 29; fabRY = PH - 36 - 29;
+  
+  orbs.forEach((o, i) => {
+    const a = -90 + (360 / count) * i, r = a * Math.PI / 180;
+    o.style.left = (cx + radius * Math.cos(r) - 35) + 'px';
+    o.style.top = (cy + radius * Math.sin(r) - 35) + 'px';
+  });
+}
+layoutOrbs();
+window.addEventListener('resize', layoutOrbs);
 function navigate(screen){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const t=document.getElementById(screen);if(t){t.classList.add('active');t.scrollTop=0}
