@@ -4,18 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Parky</title>
-
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ffffff">
-<link rel="apple-touch-icon" href="/icon-512.png">
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;font-family:'Inter',sans-serif}
-.phone{width:390px;height:844px;background:#F2F2F2;border-radius:52px;position:relative;border:1px solid #C8C8C8;box-shadow:0 40px 80px rgba(0,0,0,0.2),0 0 0 1px rgba(255,255,255,0.5) inset}
+.phone{width:390px;height:844px;background:#F2F2F2;border-radius:52px;position:relative;border:1px solid #C8C8C8;box-shadow:0 40px 80px rgba(0,0,0,0.2),0 0 0 1px rgba(255,255,255,0.5) inset;overflow:hidden}
 .screen{position:absolute;inset:0;border-radius:52px;background:#F2F2F2;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;visibility:hidden;pointer-events:none;z-index:1}
 .screen::-webkit-scrollbar{display:none}
 .screen.active{visibility:visible;pointer-events:all;z-index:2}
@@ -23,19 +18,26 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .glass24{background:rgba(255,255,255,0.9);border:0.5px solid rgba(255,255,255,0.98);border-radius:24px;backdrop-filter:blur(20px)}
 .green-dot{width:6px;height:6px;background:#22C55E;border-radius:50%;animation:gp 2s infinite;display:inline-block;flex-shrink:0}
 @keyframes gp{0%,100%{opacity:1}50%{opacity:.35}}
-.fab{position:absolute;bottom:36px;right:24px;width:58px;height:58px;background:#0A0A0A;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.28);z-index:50;transition:all .42s cubic-bezier(.34,1.4,.64,1);user-select:none}
+
+/* FAB - fixed, positioned by JS */
+.fab{position:fixed;width:58px;height:58px;background:#0A0A0A;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.28);z-index:9999;transition:all .42s cubic-bezier(.34,1.4,.64,1);user-select:none;display:none}
 .fab svg{transition:opacity .2s}
 .fab.open svg{opacity:0}
 .fab.open::after{content:'✕';position:absolute;font-size:22px;color:#fff;font-family:'Inter',sans-serif;font-weight:300}
-.nav-overlay{position:absolute;inset:0;border-radius:52px;background:rgba(242,242,242,.9);backdrop-filter:blur(24px);z-index:48;display:none}
+
+/* Nav overlay - fixed, positioned by JS */
+.nav-overlay{position:fixed;background:rgba(242,242,242,.92);backdrop-filter:blur(24px);z-index:9998;display:none;border-radius:52px}
 .nav-overlay.active{display:block}
-.nav-orb{position:absolute;width:70px;height:70px;background:#fff;border:0.5px solid rgba(0,0,0,.06);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.1);opacity:0;transform:scale(.2);transition:opacity .22s,transform .22s;z-index:49;pointer-events:none}
+
+/* Nav orbs - fixed, positioned by JS */
+.nav-orb{position:fixed;width:70px;height:70px;background:#fff;border:0.5px solid rgba(0,0,0,.06);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.1);opacity:0;transform:scale(.2);transition:opacity .22s,transform .22s;z-index:9999;pointer-events:none}
 .nav-orb.visible{opacity:1;transform:scale(1);pointer-events:all}
 .nav-orb.current{background:#0A0A0A}
 .nav-orb.current svg{stroke:#fff!important}
 .nav-orb.current .nav-orb-label{color:rgba(255,255,255,.6)}
 .nav-orb svg{width:22px;height:22px;stroke:rgba(0,0,0,.6);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .nav-orb-label{font-size:9px;font-weight:700;color:rgba(0,0,0,.45);text-transform:uppercase;letter-spacing:.05em}
+
 .sheet-backdrop{position:absolute;inset:0;border-radius:52px;background:rgba(0,0,0,.35);z-index:60;display:none;backdrop-filter:blur(4px)}
 .sheet-backdrop.active{display:block}
 .bottom-sheet{position:absolute;bottom:0;left:0;right:0;background:#F5F5F5;border-radius:28px 28px 0 0;z-index:61;transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.1,.64,1);visibility:hidden;pointer-events:none;max-height:90%;overflow-y:auto;scrollbar-width:none}
@@ -76,7 +78,6 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .see-all{font-size:12px;color:rgba(0,0,0,.4);cursor:pointer}
 .hist-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.85);border:0.5px solid rgba(255,255,255,.98);border-radius:18px;margin-bottom:9px;cursor:pointer}
 .hist-icon{width:44px;height:44px;background:rgba(0,0,0,.05);border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-#saveFlow{padding:0 20px 30px}
 .save-input{width:100%;padding:14px 16px;background:rgba(255,255,255,.9);border:0.5px solid rgba(0,0,0,.1);border-radius:14px;font-size:15px;font-family:'Inter',sans-serif;color:#0A0A0A;outline:none;margin-bottom:12px}
 .save-input:focus{border-color:rgba(0,0,0,.3)}
 .save-input::placeholder{color:rgba(0,0,0,.3)}
@@ -108,11 +109,11 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 #map{background:#E8E8E8}
 .map-wrap{position:absolute;inset:0;border-radius:52px;overflow:hidden}
 #leaflet-map{position:absolute;inset:0;z-index:1}
-.map-top{position:absolute;top:52px;left:16px;right:16px;z-index:10;display:flex;gap:10px}
+.map-top{position:absolute;top:16px;left:16px;right:16px;z-index:10;display:flex;gap:10px}
 .map-card-overlay{background:rgba(255,255,255,.96);border:0.5px solid rgba(255,255,255,1);border-radius:20px;backdrop-filter:blur(16px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
-.map-bottom{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 16px 40px}
-.map-recenter-btn{position:absolute;bottom:210px;right:16px;width:44px;height:44px;background:rgba(255,255,255,.95);border:0.5px solid rgba(255,255,255,1);border-radius:12px;backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,.1)}
-#settings{padding:0 0 100px}
+.map-bottom{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 16px 100px}
+.map-recenter-btn{position:absolute;bottom:220px;right:16px;width:44px;height:44px;background:rgba(255,255,255,.95);border:0.5px solid rgba(255,255,255,1);border-radius:12px;backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+#settings{padding:0 0 100px;overflow-y:auto}
 .top-nav{display:flex;justify-content:center;align-items:center;padding:16px 24px;position:relative}
 .back-btn{position:absolute;left:24px;width:36px;height:36px;background:rgba(255,255,255,.85);border:0.5px solid rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .avatar-wrap{display:flex;justify-content:center;margin-bottom:-55px;position:relative;z-index:3}
@@ -130,15 +131,14 @@ body{background:#E0E0E0;display:flex;justify-content:center;align-items:flex-sta
 .theme-toggle{display:flex;background:rgba(0,0,0,.06);border-radius:100px;padding:3px;gap:2px}
 .theme-opt{padding:5px 14px;border-radius:100px;font-size:12px;font-weight:600;color:rgba(0,0,0,.4);cursor:pointer;transition:all .2s}
 .theme-opt.active{background:#0A0A0A;color:#fff}
-
 body.dark{background:#1a1a1a}
 body.dark .phone{background:#0A0A0A;border-color:#333}
 body.dark .screen{background:#0A0A0A}
 body.dark .glass,body.dark .glass24{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
-body.dark .greeting-name,body.dark .save-title,body.dark .stat-value,body.dark .session-top span:last-child{color:#fff}
+body.dark .greeting-name,body.dark .save-title,body.dark .stat-value{color:#fff}
 body.dark .greeting-sub,body.dark .save-sub,body.dark .stat-label,body.dark .sec-label{color:rgba(255,255,255,.35)}
 body.dark .hist-row{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
-body.dark .nav-overlay{background:rgba(10,10,10,.9)}
+body.dark .nav-overlay{background:rgba(10,10,10,.95)}
 body.dark .nav-orb{background:#1a1a1a;border-color:rgba(255,255,255,.1)}
 body.dark .nav-orb svg{stroke:rgba(255,255,255,.7)}
 body.dark .nav-orb-label{color:rgba(255,255,255,.4)}
@@ -149,65 +149,23 @@ body.dark .f-pill.active{background:#fff;color:#000}
 body.dark .s-card,body.dark .profile-card{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
 body.dark #settings,body.dark #home,body.dark #history,body.dark #spend{background:#0A0A0A}
 body.dark .h-card{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
-body.dark .save-circle{box-shadow:0 12px 36px rgba(0,0,0,.6)}
-body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
-
-/* ══ MOBILE & PWA FULLSCREEN FIXED ══ */
-@media (max-width: 480px), (display-mode: standalone) {
-  body {
-    padding: 0;
-    margin: 0;
-    display: block; /* Removes flex issues causing top cut-offs */
-    background: #F2F2F2;
-    overflow: hidden;
-    height: 100vh; /* Fallback */
-    height: 100dvh; /* Modern mobile viewport height */
-  }
-
-  body.dark { background: #0A0A0A; }
-
-  .phone {
-    width: 100vw;
-    height: 100vh; 
-    height: 100dvh;
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
-    position: absolute;
-    inset: 0;
-    /* Respect hardware notches and home swipe bars */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  /* Ensure the active screens don't overflow layout limits */
-  .screen, 
-  .nav-overlay, 
-  .h-scroll, 
-  .spend-scroll,
-  .map-wrap {
-    border-radius: 0;
-  }
-
-  .nav-overlay {
-    position: fixed;
-    inset: 0;
-  }
-
-  /* Essential for fixed bottom sheets not getting hidden by iOS/Android swipe bars */
-  .bottom-sheet {
-    padding-bottom: env(safe-area-inset-bottom, 20px);
-  }
+body.dark .h-scroll,body.dark .spend-scroll{background:#0A0A0A}
+@media(max-width:480px),(display-mode:standalone){
+  body{padding:0;margin:0;display:block;background:#F2F2F2;overflow:hidden;height:100dvh}
+  body.dark{background:#0A0A0A}
+  .phone{width:100vw;height:100dvh;border-radius:0;border:none;box-shadow:none;position:absolute;inset:0;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  .screen,.h-scroll,.spend-scroll,.map-wrap{border-radius:0}
+  .nav-overlay{border-radius:0!important}
+  .bottom-sheet{padding-bottom:env(safe-area-inset-bottom,20px)}
 }
 </style>
 </head>
 <body>
 <div class="phone" id="phone">
-
 <div class="screen active" id="home">
   <div class="top-row">
     <div><p class="greeting-sub" id="greeting">Good morning,</p><p class="greeting-name">Neel.</p></div>
-    <div class="notif-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+    <div class="notif-btn" onclick="showNotif()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
   </div>
   <div class="save-section">
     <div class="save-circle" id="saveCircle" onclick="openSave()">
@@ -241,61 +199,101 @@ body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
   <div id="recentList"></div>
 </div>
 
-<div class="sheet-backdrop" id="saveBackdrop" onclick="closeSave()"></div>
-<div class="bottom-sheet" id="saveSheet">
-  <div class="sheet-handle"></div>
-  <div style="padding:16px 20px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-    <p style="font-size:20px;font-weight:800;color:#0A0A0A;letter-spacing:-.4px">Save My Spot</p>
-    <div onclick="closeSave()" style="width:32px;height:32px;background:rgba(0,0,0,.06);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+<!-- SAVE FLOW - FULL SCREEN -->
+<div class="screen" id="saveFlow">
+  <div style="display:flex;align-items:center;gap:16px;padding:20px 20px 0;flex-shrink:0">
+    <div onclick="navigate('home')" style="width:40px;height:40px;background:rgba(0,0,0,.06);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <p style="font-size:18px;font-weight:800;color:#0A0A0A;letter-spacing:-.3px">Save My Spot</p>
   </div>
-  <div id="saveFlow">
-    <div style="background:rgba(34,197,94,.08);border:0.5px solid rgba(34,197,94,.2);border-radius:14px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+  <div style="padding:20px 20px 120px;overflow-y:auto">
+    <!-- Photo -->
+    <p class="s-lbl" style="margin-top:0">Photo</p>
+    <div id="photoZone" style="width:100%;height:150px;background:rgba(0,0,0,.04);border:1.5px dashed rgba(0,0,0,.13);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;cursor:pointer;position:relative;overflow:hidden" onclick="document.getElementById('photoUpload').click()">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1.5" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <p style="font-size:13px;color:rgba(0,0,0,.3);font-weight:500">Tap to add photo</p>
+      <img id="photoPreview" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:16px"/>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:4px">
+      <button onclick="document.getElementById('cameraInput').click()" style="flex:1;padding:11px;background:rgba(255,255,255,.9);border:0.5px solid rgba(0,0,0,.09);border-radius:12px;font-size:13px;font-weight:600;color:#0A0A0A;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>Camera</button>
+      <button onclick="document.getElementById('photoUpload').click()" style="flex:1;padding:11px;background:rgba(255,255,255,.9);border:0.5px solid rgba(0,0,0,.09);border-radius:12px;font-size:13px;font-weight:600;color:#0A0A0A;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload</button>
+    </div>
+    <input type="file" id="photoUpload" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
+    <!-- GPS -->
+    <p class="s-lbl">Location</p>
+    <div style="background:rgba(34,197,94,.08);border:0.5px solid rgba(34,197,94,.2);border-radius:14px;padding:12px 16px;margin-bottom:10px;display:flex;align-items:center;gap:10px">
       <span class="green-dot"></span>
-      <div><p style="font-size:14px;font-weight:600;color:#0A0A0A" id="gpsLocation">Detecting location...</p><p style="font-size:11px;color:rgba(0,0,0,.4)">GPS · High accuracy</p></div>
+      <div style="flex:1"><p style="font-size:14px;font-weight:600;color:#0A0A0A" id="gpsCity">Detecting...</p><p style="font-size:11px;color:rgba(0,0,0,.4)" id="gpsCoords">Getting GPS...</p></div>
     </div>
-    <p class="s-lbl" style="margin-top:0">Spot / Floor</p>
+    <input class="save-input" placeholder="Address or place name" id="inAddress"/>
+    <!-- Spot -->
+    <p class="s-lbl">Spot / Level</p>
     <input class="save-input" placeholder="e.g. Level P2, Spot 34" id="inSpot"/>
-    <p class="s-lbl">Address or landmark</p>
-    <input class="save-input" placeholder="e.g. Tyson's Corner Mall" id="inAddress"/>
-    <p class="s-lbl">Payment Method</p>
-    <div class="s-row" id="payOpts">
-      <div class="s-opt active" onclick="pick(this,'pay')">Cash</div>
-      <div class="s-opt" onclick="pick(this,'pay')">Card</div>
-      <div class="s-opt" onclick="pick(this,'pay')">App</div>
-      <div class="s-opt" onclick="pick(this,'pay')">Free</div>
-    </div>
-    <p class="s-lbl">Cost ($)</p>
-    <input class="save-input" placeholder="0.00" type="number" step="0.01" id="inCost"/>
-    <p class="s-lbl">Meter Timer</p>
-    <div class="s-row" id="timerOpts">
-      <div class="s-opt active" onclick="pick(this,'timer')">None</div>
-      <div class="s-opt" onclick="pick(this,'timer')">30 min</div>
-      <div class="s-opt" onclick="pick(this,'timer')">1 hr</div>
-      <div class="s-opt" onclick="pick(this,'timer')">2 hr</div>
-    </div>
+    <!-- Notes -->
     <p class="s-lbl">Notes</p>
     <textarea class="save-input" placeholder="e.g. Near elevator B, blue section..." style="height:72px;resize:none;font-family:Inter,sans-serif" id="inNotes"></textarea>
-    <button onclick="confirmSave()" style="width:100%;padding:16px;background:#0A0A0A;border:none;border-radius:16px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:'Inter',sans-serif">Save My Spot</button>
+    <!-- Payment -->
+    <p class="s-lbl">Payment</p>
+    <div class="s-row" id="payOpts">
+      <div class="s-opt active" onclick="pick(this,'payOpts')">Cash</div>
+      <div class="s-opt" onclick="pick(this,'payOpts')">Card</div>
+      <div class="s-opt" onclick="pick(this,'payOpts')">App</div>
+      <div class="s-opt" onclick="pick(this,'payOpts')">Free</div>
+    </div>
+    <!-- Cost -->
+    <p class="s-lbl">Cost ($)</p>
+    <input class="save-input" placeholder="0.00" type="number" step="0.01" id="inCost"/>
+    <!-- Timer -->
+    <p class="s-lbl">Meter Timer</p>
+    <div class="s-row" id="timerOpts" style="margin-bottom:6px">
+      <div class="s-opt active" onclick="pickTimer(this)">None</div>
+      <div class="s-opt" onclick="pickTimer(this)">30 min</div>
+      <div class="s-opt" onclick="pickTimer(this)">1 hr</div>
+      <div class="s-opt" onclick="pickTimer(this)">2 hr</div>
+      <div class="s-opt" onclick="pickTimer(this)">Custom</div>
+    </div>
+    <input class="save-input" id="customTimer" type="number" placeholder="Enter minutes" style="display:none"/>
+
+    <!-- Notify before expiry -->
+    <p class="s-lbl">Notify me before meter expires</p>
+    <div class="s-row" id="notifyOpts" style="margin-bottom:4px">
+      <div class="s-opt" onclick="pick(this,'notifyOpts')">5 min</div>
+      <div class="s-opt" onclick="pick(this,'notifyOpts')">10 min</div>
+      <div class="s-opt active" onclick="pick(this,'notifyOpts')">15 min</div>
+      <div class="s-opt" onclick="pick(this,'notifyOpts')">30 min</div>
+      <div class="s-opt" onclick="pick(this,'notifyOpts')">Off</div>
+    </div>
+    <p style="font-size:11px;color:rgba(0,0,0,.3);margin-bottom:4px">Only applies when a meter timer is set</p>
+
+    <button onclick="confirmSave()" style="width:100%;padding:16px;background:#0A0A0A;border:none;border-radius:16px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:'Inter',sans-serif;margin-top:16px">Save My Spot</button>
   </div>
 </div>
+
+<!-- SUCCESS SCREEN -->
+<div class="screen" id="saveSuccess" style="background:#22C55E;overflow:hidden"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;height:100%">
+  <div style="width:100px;height:100px;background:rgba(255,255,255,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:28px">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <p style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:12px">Your location has been saved!</p>
+  <p style="font-size:15px;color:rgba(255,255,255,.8);line-height:1.5;margin-bottom:40px">Your parking spot has been recorded successfully.</p>
+  <button onclick="navigate('home')" style="padding:16px 40px;background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.5);border-radius:100px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;font-family:'Inter',sans-serif">Return Home</button>
+  <p style="font-size:12px;color:rgba(255,255,255,.5);margin-top:20px" id="successCountdown">Returning in 3s...</p>
+</div></div>
 
 <div class="screen" id="history">
   <div class="sheet-backdrop" id="histFilterBackdrop" onclick="closeHistFilter()"></div>
   <div class="bottom-sheet" id="histFilterSheet">
     <div class="sheet-handle"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 20px">
-      <p style="font-size:17px;font-weight:700;color:#0A0A0A">Filter</p>
-      <p style="font-size:13px;color:rgba(0,0,0,.4);cursor:pointer" onclick="resetHistFilter()">Reset all</p>
-    </div>
-    <div class="f-section"><p class="f-label">Status</p><div class="filter-pills" id="hf-status"><div class="f-pill active" onclick="fpick(this)">All</div><div class="f-pill" onclick="fpick(this)">Active</div><div class="f-pill" onclick="fpick(this)">Expired</div><div class="f-pill" onclick="fpick(this)">Free</div></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 20px"><p style="font-size:17px;font-weight:700;color:#0A0A0A">Filter</p><p style="font-size:13px;color:rgba(0,0,0,.4);cursor:pointer" onclick="resetHistFilter()">Reset all</p></div>
+    <div class="f-section"><p class="f-label">Status</p><div class="filter-pills" id="hf-status"><div class="f-pill active" onclick="fpick(this)">All</div><div class="f-pill" onclick="fpick(this)">Active</div><div class="f-pill" onclick="fpick(this)">Free</div></div></div>
     <div class="filter-sep"></div>
     <div class="f-section"><p class="f-label">Payment</p><div class="filter-pills" id="hf-pay"><div class="f-pill active" onclick="fpick(this)">All</div><div class="f-pill" onclick="fpick(this)">Cash</div><div class="f-pill" onclick="fpick(this)">Card</div><div class="f-pill" onclick="fpick(this)">App</div></div></div>
     <div class="filter-sep"></div>
-    <div class="f-section"><p class="f-label">Sort By</p><div class="filter-pills" id="hf-sort"><div class="f-pill active" onclick="fpick(this)">Newest</div><div class="f-pill" onclick="fpick(this)">Oldest</div><div class="f-pill" onclick="fpick(this)">Highest cost</div><div class="f-pill" onclick="fpick(this)">Longest</div></div></div>
+    <div class="f-section"><p class="f-label">Sort By</p><div class="filter-pills" id="hf-sort"><div class="f-pill active" onclick="fpick(this)">Newest</div><div class="f-pill" onclick="fpick(this)">Oldest</div><div class="f-pill" onclick="fpick(this)">Highest cost</div></div></div>
     <button class="apply-btn" onclick="applyHistFilter()">Apply Filters</button>
     <div style="height:20px"></div>
   </div>
-  <div class="h-scroll" id="histScroll">
+  <div class="h-scroll">
     <div style="padding:20px 20px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <p style="font-size:28px;font-weight:800;color:#0A0A0A;letter-spacing:-.8px">History</p>
       <div style="display:flex;gap:8px;align-items:center">
@@ -303,7 +301,7 @@ body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
           <div id="vList" onclick="setView('list')" style="width:32px;height:32px;border-radius:9px;background:#0A0A0A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
           <div id="vCal" onclick="setView('cal')" style="width:32px;height:32px;border-radius:9px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
         </div>
-        <div onclick="openHistFilter()" style="height:38px;padding:0 14px;background:rgba(255,255,255,.85);border:0.5px solid rgba(255,255,255,.95);border-radius:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span style="font-size:12px;font-weight:600;color:rgba(0,0,0,.55)">Filter</span></div>
+        <div onclick="openHistFilter()" style="height:38px;padding:0 14px;background:rgba(255,255,255,.85);border:0.5px solid rgba(255,255,255,.95);border-radius:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span style="font-size:12px;font-weight:600;color:rgba(0,0,0,.55)">Filter</span></div>
       </div>
     </div>
     <div style="padding:0 20px;margin-bottom:20px">
@@ -316,13 +314,11 @@ body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
     <div id="calView" style="display:none;padding:0 20px;margin-bottom:20px">
       <div class="glass" style="padding:18px;border-radius:20px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.4)" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <div onclick="calPrev()" style="cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.4)" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
           <p style="font-size:15px;font-weight:700;color:#0A0A0A" id="calMonthLabel">June 2026</p>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.4)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          <div onclick="calNext()" style="cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.4)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:8px">
-          <p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">S</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">M</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">T</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">W</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">T</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">F</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">S</p>
-        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:8px"><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">S</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">M</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">T</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">W</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">T</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">F</p><p style="font-size:10px;font-weight:700;color:rgba(0,0,0,.3)">S</p></div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center" id="calGrid"></div>
       </div>
     </div>
@@ -334,39 +330,27 @@ body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
   <div class="sheet-backdrop" id="spendFilterBackdrop" onclick="closeSpendFilter()"></div>
   <div class="bottom-sheet" id="spendFilterSheet">
     <div class="sheet-handle"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 20px">
-      <p style="font-size:17px;font-weight:700;color:#0A0A0A">Filter</p>
-      <p style="font-size:13px;color:rgba(0,0,0,.4);cursor:pointer" onclick="resetSpendFilter()">Reset all</p>
-    </div>
-    <div class="f-section"><p class="f-label">Payment Method</p><div class="filter-pills" id="sf-pay"><div class="f-pill active" onclick="fpick(this)">All</div><div class="f-pill" onclick="fpick(this)">Cash</div><div class="f-pill" onclick="fpick(this)">Card</div><div class="f-pill" onclick="fpick(this)">App</div></div></div>
-    <div class="filter-sep"></div>
-    <div class="f-section"><p class="f-label">Cost Range</p><div class="filter-pills" id="sf-cost"><div class="f-pill active" onclick="fpick(this)">Any</div><div class="f-pill" onclick="fpick(this)">Free only</div><div class="f-pill" onclick="fpick(this)">Under $5</div><div class="f-pill" onclick="fpick(this)">$5–$10</div><div class="f-pill" onclick="fpick(this)">Over $10</div></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 20px"><p style="font-size:17px;font-weight:700;color:#0A0A0A">Filter</p><p style="font-size:13px;color:rgba(0,0,0,.4);cursor:pointer" onclick="resetSpendFilter()">Reset all</p></div>
+    <div class="f-section"><p class="f-label">Payment</p><div class="filter-pills" id="sf-pay"><div class="f-pill active" onclick="fpick(this)">All</div><div class="f-pill" onclick="fpick(this)">Cash</div><div class="f-pill" onclick="fpick(this)">Card</div><div class="f-pill" onclick="fpick(this)">App</div></div></div>
     <div class="filter-sep"></div>
     <div class="f-section"><p class="f-label">Sort</p><div class="filter-pills" id="sf-sort"><div class="f-pill active" onclick="fpick(this)">Newest</div><div class="f-pill" onclick="fpick(this)">Highest cost</div><div class="f-pill" onclick="fpick(this)">Lowest cost</div></div></div>
-    <button class="apply-btn" onclick="closeSpendFilter()">Apply Filters</button>
+    <button class="apply-btn" onclick="closeSpendFilter()">Apply</button>
     <div style="height:20px"></div>
   </div>
   <div class="spend-scroll">
     <div style="padding:20px 20px 0">
       <p style="font-size:28px;font-weight:800;color:#0A0A0A;letter-spacing:-.8px;margin-bottom:20px">Spend</p>
       <div style="display:flex;gap:10px;margin-bottom:24px;align-items:center">
-        <div style="flex:1;display:flex;background:rgba(255,255,255,.9);border:0.5px solid rgba(255,255,255,.98);border-radius:14px;padding:4px;gap:3px;backdrop-filter:blur(20px)">
+        <div style="flex:1;display:flex;background:rgba(255,255,255,.9);border:0.5px solid rgba(255,255,255,.98);border-radius:14px;padding:4px;gap:3px">
           <button class="period-pill active" onclick="setPeriod(this,'week')">This Week</button>
           <button class="period-pill" onclick="setPeriod(this,'month')">This Month</button>
           <button class="period-pill" onclick="setPeriod(this,'all')">All Time</button>
         </div>
-        <div onclick="openSpendFilter()" style="width:42px;height:42px;background:rgba(255,255,255,.9);border:0.5px solid rgba(255,255,255,.98);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(20px);flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
+        <div onclick="openSpendFilter()" style="width:42px;height:42px;background:rgba(255,255,255,.9);border:0.5px solid rgba(255,255,255,.98);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
       </div>
       <div class="glass24" style="padding:24px;margin-bottom:14px">
         <p style="font-size:12px;font-weight:600;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Total Spent</p>
-        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px">
-          <p style="font-size:48px;font-weight:800;color:#0A0A0A;letter-spacing:-2px;line-height:1" id="spendTotal">$0.00</p>
-          <div style="display:flex;align-items:center;gap:4px;padding:6px 12px;background:rgba(34,197,94,.1);border:0.5px solid rgba(34,197,94,.2);border-radius:100px;margin-bottom:6px" id="trendBadge">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline id="trendArrow" points="18 15 12 9 6 15"/></svg>
-            <span style="font-size:12px;font-weight:700;color:#16A34A" id="trendTxt">$0 change</span>
-          </div>
-        </div>
-        <svg width="100%" height="48" viewBox="0 0 310 48" preserveAspectRatio="none" style="display:block;margin-bottom:4px"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0A0A0A" stop-opacity=".12"/><stop offset="100%" stop-color="#0A0A0A" stop-opacity="0"/></linearGradient></defs><path id="sparkPath" d="M0 38 L310 38" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-linecap="round"/><path id="sparkFill" d="M0 38 L310 38 L310 48 L0 48Z" fill="url(#sg)"/></svg>
+        <p style="font-size:48px;font-weight:800;color:#0A0A0A;letter-spacing:-2px;line-height:1;margin-bottom:8px" id="spendTotal">$0.00</p>
         <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:rgba(0,0,0,.28)" id="sStart">--</span><span style="font-size:10px;color:rgba(0,0,0,.28)" id="sEnd">--</span></div>
       </div>
       <div style="display:flex;gap:10px;margin-bottom:14px">
@@ -377,7 +361,7 @@ body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
         <p style="font-size:13px;font-weight:700;color:#0A0A0A;margin-bottom:16px">By Payment Method</p>
         <div id="payBreakdown"></div>
       </div>
-      <div class="glass24" style="padding:20px;margin-bottom:140px">
+      <div class="glass24" style="padding:20px;margin-bottom:160px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><p style="font-size:13px;font-weight:700;color:#0A0A0A">Recent Transactions</p><p style="font-size:12px;color:rgba(0,0,0,.38);cursor:pointer" onclick="navigate('history')">See all</p></div>
         <div id="txnList"></div>
       </div>
@@ -396,7 +380,7 @@ body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
     </div>
     <div class="map-recenter-btn" onclick="recenterMap()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div>
     <div class="map-bottom">
-      <div class="map-card-overlay" style="padding:20px" id="mapCard">
+      <div class="map-card-overlay" style="padding:20px">
         <div id="mapNoSession" style="text-align:center;padding:10px 0"><p style="font-size:15px;font-weight:600;color:#0A0A0A;margin-bottom:6px">No active session</p><p style="font-size:12px;color:rgba(0,0,0,.4)">Save your spot on the home screen</p><button onclick="navigate('home')" style="margin-top:14px;padding:12px 24px;background:#0A0A0A;border:none;border-radius:12px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;font-family:'Inter',sans-serif">Go to Home</button></div>
         <div id="mapSession" style="display:none">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
@@ -419,41 +403,171 @@ body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
 </div>
 
 <div class="screen" id="settings">
-  <div class="status-bar" style="margin-bottom:16px"><span>9:41</span><div class="status-right"><svg width="16" height="11" viewBox="0 0 16 11" fill="none"><rect x="0" y="4" width="3" height="7" rx=".8" fill="#0A0A0A"/><rect x="4.5" y="2.5" width="3" height="8.5" rx=".8" fill="#0A0A0A"/><rect x="9" y=".5" width="3" height="10.5" rx=".8" fill="#0A0A0A"/><rect x="13.5" y="0" width="2.5" height="11" rx=".8" fill="rgba(0,0,0,0.15)"/></svg></div></div>
   <div class="top-nav"><div class="back-btn" onclick="navigate('home')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div><span style="font-size:16px;font-weight:600;color:#0A0A0A">Settings</span></div>
-  <div class="avatar-wrap"><div class="avatar-circle">N</div></div>
+  <div class="avatar-wrap">
+    <div class="avatar-circle" id="avatarCircle" onclick="navigate('profileEdit')" style="cursor:pointer;position:relative">
+      <span id="avatarLetter">N</span>
+      <div style="position:absolute;bottom:4px;right:4px;width:24px;height:24px;background:#fff;border-radius:50%;border:2px solid #F2F2F2;display:flex;align-items:center;justify-content:center">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+    </div>
+  </div>
   <div class="profile-card">
-    <p style="font-size:20px;font-weight:700;color:#0A0A0A;letter-spacing:-.3px;margin-bottom:3px">Neel Verma</p>
+    <p style="font-size:20px;font-weight:700;color:#0A0A0A;letter-spacing:-.3px;margin-bottom:3px" id="profileName">Neel Verma</p>
     <p style="font-size:13px;color:rgba(0,0,0,.4);margin-bottom:18px">Local account · <span id="sessionCountLabel">0 sessions</span></p>
     <div style="height:.5px;background:rgba(0,0,0,.07);margin-bottom:16px"></div>
     <div style="display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:14px;font-weight:500;color:#0A0A0A">Appearance</span>
-      <div class="theme-toggle" id="themeToggle">
-        <div class="theme-opt active" onclick="setTheme('light')">Light</div>
-        <div class="theme-opt" onclick="setTheme('dark')">Dark</div>
-      </div>
+      <div class="theme-toggle"><div class="theme-opt active" onclick="setTheme('light')">Light</div><div class="theme-opt" onclick="setTheme('dark')">Dark</div></div>
     </div>
+  </div>
+  <div style="font-size:11px;font-weight:700;color:rgba(0,0,0,.32);text-transform:uppercase;letter-spacing:.1em;padding:0 20px;margin-bottom:10px">Account</div>
+  <div class="s-card">
+    <div class="s-row2" onclick="navigate('profileEdit')"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Edit Profile</p><p style="font-size:12px;color:rgba(0,0,0,.38)">Name, initial, color</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
   </div>
   <div style="font-size:11px;font-weight:700;color:rgba(0,0,0,.32);text-transform:uppercase;letter-spacing:.1em;padding:0 20px;margin-bottom:10px">Preferences</div>
   <div class="s-card">
-    <div class="s-row2"><div class="row-icon2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Default timer</p><p style="font-size:12px;color:rgba(0,0,0,.38)">2 hours</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
-    <div class="s-row2"><div class="row-icon2"><svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Map provider</p><p style="font-size:12px;color:rgba(0,0,0,.38)">Apple Maps</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
-    <div class="s-row2"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Notifications</p></div><div class="toggle-sw" id="notifToggle" onclick="toggleSwitch(this)"></div></div>
-    <div class="s-row2"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Location access</p><p style="font-size:12px;color:rgba(0,0,0,.38)">Always on</p></div><div class="toggle-sw" onclick="toggleSwitch(this)"></div></div>
+    <div class="s-row2" onclick="openTimerSheet()"><div class="row-icon2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Default timer</p><p style="font-size:12px;color:rgba(0,0,0,.38)" id="defTimerLbl">2 hours</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    <div class="s-row2" onclick="openNotifySheet()"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/><line x1="12" y1="2" x2="12" y2="0"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Default notify before</p><p style="font-size:12px;color:rgba(0,0,0,.38)" id="defNotifyLbl">15 minutes</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    <div class="s-row2"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Notifications</p><p style="font-size:12px;color:rgba(0,0,0,.38)">Meter alerts</p></div><div class="toggle-sw" id="notifToggle" onclick="togglePref(this,'notif')"></div></div>
+    <div class="s-row2"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Location access</p><p style="font-size:12px;color:rgba(0,0,0,.38)">Always on</p></div><div class="toggle-sw" id="locToggle" onclick="togglePref(this,'loc')"></div></div>
   </div>
   <div style="font-size:11px;font-weight:700;color:rgba(0,0,0,.32);text-transform:uppercase;letter-spacing:.1em;padding:0 20px;margin-bottom:10px">Data</div>
   <div class="s-card">
-    <div class="s-row2"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Export history</p><p style="font-size:12px;color:rgba(0,0,0,.38)">Download as CSV</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
-    <div class="s-row2" onclick="clearAllData()"><div class="row-icon2" style="background:rgba(239,68,68,.08)"><svg viewBox="0 0 24 24" style="stroke:#DC2626"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#DC2626">Clear all data</p><p style="font-size:12px;color:rgba(0,0,0,.38)">Permanently delete all sessions</p></div></div>
+    <div class="s-row2" onclick="exportData()"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Export Data</p><p style="font-size:12px;color:rgba(0,0,0,.38)">Download as JSON</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    <div class="s-row2" onclick="document.getElementById('importFile').click()"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Import Data</p><p style="font-size:12px;color:rgba(0,0,0,.38)" id="importStatus">Restore from JSON</p></div></div>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+    <div class="s-row2" onclick="clearAllData()"><div class="row-icon2" style="background:rgba(239,68,68,.08)"><svg viewBox="0 0 24 24" style="stroke:#DC2626"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#DC2626">Clear All Data</p><p style="font-size:12px;color:rgba(0,0,0,.38)">Cannot be undone</p></div></div>
   </div>
-  <div style="font-size:11px;font-weight:700;color:rgba(0,0,0,.32);text-transform:uppercase;letter-spacing:.1em;padding:0 20px;margin-bottom:10px">About</div>
+  <div style="font-size:11px;font-weight:700;color:rgba(0,0,0,.32);text-transform:uppercase;letter-spacing:.1em;padding:0 20px;margin-bottom:10px">Support</div>
   <div class="s-card">
-    <div class="s-row2"><div class="row-icon2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Help & Support</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
-    <div class="s-row2"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Terms of use</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    <div class="s-row2" onclick="navigate('helpScreen')"><div class="row-icon2"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Help & Support</p><p style="font-size:12px;color:rgba(0,0,0,.38)">AI chat assistant</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    <div class="s-row2" onclick="navigate('termsScreen')"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Terms of Use</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+    <div class="s-row2" onclick="navigate('privacyScreen')"><div class="row-icon2"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:500;color:#0A0A0A">Privacy Policy</p></div><div style="width:14px;height:14px"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>
   </div>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0 40px"><p style="font-size:16px;font-weight:800;color:rgba(0,0,0,.18);letter-spacing:-.5px">Parky</p><p style="font-size:11px;color:rgba(0,0,0,.2)">Version 1.0.0</p></div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:24px 0 40px"><p style="font-size:16px;font-weight:800;color:rgba(0,0,0,.18);letter-spacing:-.5px">Parky</p><p style="font-size:11px;color:rgba(0,0,0,.2)">Version 1.0.0</p></div>
 </div>
 
+<!-- PROFILE EDIT -->
+<div class="screen" id="profileEdit">
+  <div class="top-nav"><div class="back-btn" onclick="navigate('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div><span style="font-size:16px;font-weight:600;color:#0A0A0A">Edit Profile</span></div>
+  <div style="padding:20px">
+    <div style="display:flex;justify-content:center;margin-bottom:24px"><div id="peAvatar" style="width:90px;height:90px;background:#0A0A0A;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#fff">N</div></div>
+    <p class="s-lbl" style="margin-top:0">Full Name</p>
+    <input class="save-input" id="peName" placeholder="Your name"/>
+    <p class="s-lbl">Avatar Initial</p>
+    <input class="save-input" id="peInit" placeholder="Single letter e.g. N" maxlength="1" oninput="document.getElementById('peAvatar').textContent=this.value.toUpperCase()||'N'"/>
+    <p class="s-lbl">Avatar Color</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px" id="colorPicker">
+      <div onclick="pickColor(this,'#0A0A0A')" style="width:44px;height:44px;background:#0A0A0A;border-radius:50%;cursor:pointer;border:3px solid #0A0A0A"></div>
+      <div onclick="pickColor(this,'#1D4ED8')" style="width:44px;height:44px;background:#1D4ED8;border-radius:50%;cursor:pointer;border:3px solid transparent"></div>
+      <div onclick="pickColor(this,'#15803D')" style="width:44px;height:44px;background:#15803D;border-radius:50%;cursor:pointer;border:3px solid transparent"></div>
+      <div onclick="pickColor(this,'#B91C1C')" style="width:44px;height:44px;background:#B91C1C;border-radius:50%;cursor:pointer;border:3px solid transparent"></div>
+      <div onclick="pickColor(this,'#7C3AED')" style="width:44px;height:44px;background:#7C3AED;border-radius:50%;cursor:pointer;border:3px solid transparent"></div>
+      <div onclick="pickColor(this,'#C2410C')" style="width:44px;height:44px;background:#C2410C;border-radius:50%;cursor:pointer;border:3px solid transparent"></div>
+    </div>
+    <button onclick="saveProfile()" style="width:100%;padding:16px;background:#0A0A0A;border:none;border-radius:16px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:'Inter',sans-serif">Save Profile</button>
+  </div>
+</div>
+
+<!-- HELP / AI CHAT -->
+<div class="screen" id="helpScreen">
+  <div class="top-nav" style="flex-shrink:0;border-bottom:0.5px solid rgba(0,0,0,.06)"><div class="back-btn" onclick="navigate('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div><span style="font-size:16px;font-weight:600;color:#0A0A0A">Help & Support</span></div>
+  <div id="chatMsgs" style="position:absolute;top:57px;bottom:80px;left:0;right:0;overflow-y:auto;padding:16px 16px 8px;display:flex;flex-direction:column;gap:12px;scrollbar-width:none">
+    <div style="max-width:80%;padding:12px 16px;background:rgba(255,255,255,.9);border:0.5px solid rgba(255,255,255,.98);border-radius:18px;border-bottom-left-radius:4px;font-size:14px;color:#0A0A0A;line-height:1.5;align-self:flex-start">👋 Hi! I'm Parky's assistant. Ask me anything about the app!</div>
+  </div>
+  <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:10px;padding:12px 16px 28px;background:rgba(242,242,242,.95);border-top:0.5px solid rgba(0,0,0,.06);">
+    <input id="chatInput" placeholder="Ask anything..." style="flex:1;padding:12px 16px;background:rgba(255,255,255,.92);border:0.5px solid rgba(0,0,0,.09);border-radius:100px;font-size:14px;font-family:'Inter',sans-serif;color:#0A0A0A;outline:none" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button onclick="sendChat()" style="width:44px;height:44px;background:#0A0A0A;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+</div>
+
+<!-- TERMS -->
+<div class="screen" id="termsScreen">
+  <div class="top-nav"><div class="back-btn" onclick="navigate('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div><span style="font-size:16px;font-weight:600;color:#0A0A0A">Terms of Use</span></div>
+  <div style="padding:20px 20px 80px;display:flex;flex-direction:column;gap:18px">
+    <p style="font-size:12px;color:rgba(0,0,0,.35)">Last updated: June 2026</p>
+    <div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:6px">1. Acceptance</p><p style="font-size:13px;color:rgba(0,0,0,.55);line-height:1.6">By using Parky, you agree to these terms. If you do not agree, please do not use the app.</p></div>
+    <div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:6px">2. Data Storage</p><p style="font-size:13px;color:rgba(0,0,0,.55);line-height:1.6">All your parking data is stored locally on your device. We do not collect or transmit your personal information.</p></div>
+    <div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:6px">3. Location</p><p style="font-size:13px;color:rgba(0,0,0,.55);line-height:1.6">GPS is used only to record where you parked. This data never leaves your device.</p></div>
+    <div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:6px">4. Disclaimer</p><p style="font-size:13px;color:rgba(0,0,0,.55);line-height:1.6">Parky is provided "as is". We are not responsible for parking violations or fines arising from use of the app.</p></div>
+    <div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:6px">5. Contact</p><p style="font-size:13px;color:rgba(0,0,0,.55);line-height:1.6">Questions? Use the Help & Support section of the app.</p></div>
+  </div>
+</div>
+
+<!-- PRIVACY -->
+<div class="screen" id="privacyScreen">
+  <div class="top-nav"><div class="back-btn" onclick="navigate('settings')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div><span style="font-size:16px;font-weight:600;color:#0A0A0A">Privacy Policy</span></div>
+  <div style="padding:20px 20px 80px;display:flex;flex-direction:column;gap:18px">
+    <p style="font-size:12px;color:rgba(0,0,0,.35)">Last updated: June 2026</p>
+    <div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:6px">We don't collect your data</p><p style="font-size:13px;color:rgba(0,0,0,.55);line-height:1.6">Parky stores everything locally on your device. No servers, no accounts, no data collection.</p></div>
+    <div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:6px">Location</p><p style="font-size:13px;color:rgba(0,0,0,.55);line-height:1.6">GPS coordinates are stored on-device only and never transmitted anywhere.</p></div>
+    <div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:6px">AI Chat</p><p style="font-size:13px;color:rgba(0,0,0,.55);line-height:1.6">The Help assistant sends your questions to Claude's API. Do not share sensitive personal information in chat.</p></div>
+    <div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:6px">Your Rights</p><p style="font-size:13px;color:rgba(0,0,0,.55);line-height:1.6">Delete all your data anytime in Settings → Clear All Data.</p></div>
+  </div>
+</div>
+
+<!-- TIMER SHEET -->
+<div class="sheet-backdrop" id="timerSheetBd" onclick="closeTimerSheet()" style="display:none;z-index:70"></div>
+<div class="bottom-sheet" id="timerSheet" style="z-index:71">
+  <div class="sheet-handle"></div>
+  <div style="padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center">
+    <p style="font-size:17px;font-weight:700;color:#0A0A0A">Default Timer</p>
+    <p style="font-size:13px;color:rgba(0,0,0,.4);cursor:pointer" onclick="closeTimerSheet()">Done</p>
+  </div>
+  <div style="padding:0 20px 32px">
+    <p style="font-size:13px;color:rgba(0,0,0,.45);margin-bottom:16px;line-height:1.5">Set a default meter timer when saving a new spot.</p>
+    <div id="timerOptions" style="display:flex;flex-direction:column;gap:2px">
+      <div class="timer-opt-row" onclick="setDefaultTimer(0,'None')" data-val="0"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">None</p></div><div class="timer-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="timer-opt-row" onclick="setDefaultTimer(30,'30 min')" data-val="30"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">30 minutes</p></div><div class="timer-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="timer-opt-row" onclick="setDefaultTimer(60,'1 hour')" data-val="60"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">1 hour</p></div><div class="timer-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="timer-opt-row" onclick="setDefaultTimer(120,'2 hours')" data-val="120"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">2 hours</p></div><div class="timer-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="timer-opt-row" onclick="setDefaultTimer(240,'4 hours')" data-val="240"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">4 hours</p></div><div class="timer-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFY TIMING SHEET -->
+<div class="sheet-backdrop" id="notifySheetBd" onclick="closeNotifySheet()" style="display:none;z-index:70"></div>
+<div class="bottom-sheet" id="notifySheet" style="z-index:71">
+  <div class="sheet-handle"></div>
+  <div style="padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center">
+    <p style="font-size:17px;font-weight:700;color:#0A0A0A">Notify Before Expiry</p>
+    <p style="font-size:13px;color:rgba(0,0,0,.4);cursor:pointer" onclick="closeNotifySheet()">Done</p>
+  </div>
+  <div style="padding:0 20px 32px">
+    <p style="font-size:13px;color:rgba(0,0,0,.45);margin-bottom:16px;line-height:1.5">How early do you want to be warned before your meter runs out?</p>
+    <div id="notifyOptions" style="display:flex;flex-direction:column;gap:2px">
+      <div class="timer-opt-row" onclick="setDefaultNotify(0,'Off')" data-val="0"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">Off</p><p style="font-size:12px;color:rgba(0,0,0,.38)">No warning</p></div><div class="notify-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="timer-opt-row" onclick="setDefaultNotify(5,'5 minutes')" data-val="5"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">5 minutes before</p></div><div class="notify-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="timer-opt-row" onclick="setDefaultNotify(10,'10 minutes')" data-val="10"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">10 minutes before</p></div><div class="notify-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="timer-opt-row" onclick="setDefaultNotify(15,'15 minutes')" data-val="15"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">15 minutes before</p></div><div class="notify-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="timer-opt-row" onclick="setDefaultNotify(30,'30 minutes')" data-val="30"><div style="flex:1"><p style="font-size:15px;font-weight:500;color:#0A0A0A">30 minutes before</p></div><div class="notify-check" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- METER EXPIRY NOTIFICATION BANNER -->
+<div id="meterBanner" style="display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:99999;width:358px;max-width:calc(100vw - 32px)">
+  <div style="margin:12px 0 0;background:#0A0A0A;border-radius:18px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.25);animation:slideDown .3s ease">
+    <div style="width:36px;height:36px;background:rgba(255,165,0,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <div style="flex:1">
+      <p style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px" id="bannerTitle">Meter expiring soon</p>
+      <p style="font-size:12px;color:rgba(255,255,255,.6)" id="bannerSub">5 minutes remaining</p>
+    </div>
+    <div onclick="document.getElementById('meterBanner').style.display='none'" style="color:rgba(255,255,255,.4);cursor:pointer;font-size:18px;line-height:1">✕</div>
+  </div>
+</div>
+<style>
+@keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.timer-opt-row{display:flex;align-items:center;padding:14px 0;border-bottom:0.5px solid rgba(0,0,0,.06);cursor:pointer}
+.timer-opt-row:last-child{border-bottom:none}
+</style>
+</div><!-- end phone -->
+
+<!-- FAB and nav OUTSIDE phone, fixed positioned over it -->
 <div class="fab" id="fab"><svg width="22" height="16" viewBox="0 0 22 16" fill="none"><rect width="22" height="2.2" rx="1.1" fill="white"/><rect y="6.9" width="22" height="2.2" rx="1.1" fill="white"/><rect y="13.8" width="22" height="2.2" rx="1.1" fill="white"/></svg></div>
 <div class="nav-overlay" id="navOverlay"></div>
 <div class="nav-orb" data-screen="home"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nav-orb-label">Home</span></div>
@@ -462,54 +576,51 @@ body.dark .h-scroll, body.dark .spend-scroll{background:#0A0A0A}
 <div class="nav-orb" data-screen="map"><svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span class="nav-orb-label">Map</span></div>
 <div class="nav-orb" data-screen="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="nav-orb-label">Settings</span></div>
 
-</div>
 <script>
-// ── PWA SERVICE WORKER REGISTRATION ──
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('SW registered:', reg.scope))
-      .catch(err => console.error('SW failed:', err));
+// DATA
+function getSessions(){try{return JSON.parse(localStorage.getItem('parky_s'))||[]}catch{return[]}}
+function saveSessions(s){localStorage.setItem('parky_s',JSON.stringify(s))}
+function getActive(){try{return JSON.parse(localStorage.getItem('parky_a'))||null}catch{return null}}
+function setActive(s){localStorage.setItem('parky_a',JSON.stringify(s))}
+function clearActive(){localStorage.removeItem('parky_a')}
+function getPrefs(){try{return JSON.parse(localStorage.getItem('parky_p'))||{theme:'light'}}catch{return{theme:'light'}}}
+function savePrefs(p){localStorage.setItem('parky_p',JSON.stringify(p))}
+
+// NAV - all fixed, positioned from phone rect
+const fab=document.getElementById('fab');
+const navOverlay=document.getElementById('navOverlay');
+const orbs=document.querySelectorAll('.nav-orb');
+let navOpen=false,currentScreen='home';
+const radius=145,count=orbs.length;
+let cx,cy,fabRX,fabRY;
+
+function positionNav(){
+  const r=document.getElementById('phone').getBoundingClientRect();
+  cx=r.left+r.width/2;
+  cy=r.top+r.height/2;
+  fabRX=r.left+r.width-24-29;
+  fabRY=r.top+r.height-36-29;
+  // FAB resting position
+  fab.style.left=fabRX-29+'px';
+  fab.style.top=fabRY-29+'px';
+  fab.style.display='flex';
+  // Overlay covers phone exactly
+  navOverlay.style.left=r.left+'px';
+  navOverlay.style.top=r.top+'px';
+  navOverlay.style.width=r.width+'px';
+  navOverlay.style.height=r.height+'px';
+  // Orbs in circle around phone center
+  orbs.forEach((o,i)=>{
+    const a=-90+(360/count)*i,rad=a*Math.PI/180;
+    o.style.left=(cx+radius*Math.cos(rad)-35)+'px';
+    o.style.top=(cy+radius*Math.sin(rad)-35)+'px';
   });
+  if(navOpen) fab.style.left=(cx-29)+'px',fab.style.top=(cy-29)+'px';
 }
-
-// ── DATA MODEL ──
-function getSessions(){try{return JSON.parse(localStorage.getItem('parky_sessions'))||[]}catch{return[]}}
-function saveSessions(s){localStorage.setItem('parky_sessions',JSON.stringify(s))}
-function getActive(){try{return JSON.parse(localStorage.getItem('parky_active'))||null}catch{return null}}
-function setActive(s){localStorage.setItem('parky_active',JSON.stringify(s))}
-function clearActive(){localStorage.removeItem('parky_active')}
-function getPrefs(){try{return JSON.parse(localStorage.getItem('parky_prefs'))||{theme:'light',notif:true}}catch{return{theme:'light',notif:true}}}
-function savePrefs(p){localStorage.setItem('parky_prefs',JSON.stringify(p))}
-
-// ── DYNAMIC RESPONSIVE NAV ──
-const fab = document.getElementById('fab'), navOverlay = document.getElementById('navOverlay'), orbs = document.querySelectorAll('.nav-orb');
-let open = false, currentScreen = 'home';
-let PW, PH, cx, cy, fabRX, fabRY;
-const radius = 145, count = orbs.length;
-
-function layoutOrbs() {
-  const isMobile = window.innerWidth <= 480 || window.matchMedia('(display-mode: standalone)').matches;
-  PW = isMobile ? window.innerWidth : 390;
-  PH = isMobile ? window.innerHeight : 844;
-  cx = PW / 2;
-  cy = PH / 2;
-  fabRX = PW - 24 - 29; // 29 is half of 58 (fab width)
-  fabRY = PH - 36 - 29;
-
-  orbs.forEach((o, i) => {
-    const a = -90 + (360 / count) * i, r = a * Math.PI / 180;
-    o.style.left = (cx + radius * Math.cos(r) - 35) + 'px';
-    o.style.top = (cy + radius * Math.sin(r) - 35) + 'px';
-  });
-  
-  // Re-adjust FAB position dynamically if the menu is already open
-  if (open) {
-    fab.style.transform = `translate(${cx - fabRX}px, ${cy - fabRY}px)`;
-  }
-}
-layoutOrbs();
-window.addEventListener('resize', layoutOrbs);
+// Run after paint
+requestAnimationFrame(()=>requestAnimationFrame(positionNav));
+window.addEventListener('resize',positionNav);
+window.addEventListener('scroll',positionNav);
 
 function navigate(screen){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -519,303 +630,586 @@ function navigate(screen){
   if(screen==='spend')renderSpend('week');
   if(screen==='map'){setTimeout(()=>{initMap();if(mapInstance)mapInstance.invalidateSize()},150);updateMapCard()}
   if(screen==='settings')updateSettings();
+  if(screen==='profileEdit')initProfileEdit();
+  if(screen==='helpScreen'){const m=document.getElementById('chatMsgs');if(m)m.scrollTop=m.scrollHeight;}
+  if(screen==='saveFlow'){positionNav();} // hide FAB on save screens
+  // Hide FAB on sub-screens
+  const hideFab=['saveFlow','saveSuccess','helpScreen','termsScreen','privacyScreen','profileEdit'];
+  fab.style.opacity=hideFab.includes(screen)?'0':'1';
+  fab.style.pointerEvents=hideFab.includes(screen)?'none':'all';
+  positionNav();
 }
 
 function openNav(){
-  open=true;
-  fab.style.transform=`translate(${cx-fabRX}px,${cy-fabRY}px)`;
+  navOpen=true;
+  fab.style.left=(cx-29)+'px';
+  fab.style.top=(cy-29)+'px';
   fab.classList.add('open');
-  navOverlay.classList.add('active');
+  navOverlay.style.display='block';
   orbs.forEach(o=>o.classList.toggle('current',o.dataset.screen===currentScreen));
   orbs.forEach((o,i)=>{o.style.transitionDelay=(i*.06)+'s';setTimeout(()=>o.classList.add('visible'),20)});
 }
-
 function closeNav(){
-  open=false;
-  fab.style.transform='';
+  navOpen=false;
+  // Restore FAB to corner
+  fab.style.left=(fabRX-29)+'px';
+  fab.style.top=(fabRY-29)+'px';
   fab.classList.remove('open');
   orbs.forEach((o,i)=>{o.style.transitionDelay=((count-1-i)*.04)+'s';o.classList.remove('visible')});
-  setTimeout(()=>navOverlay.classList.remove('active'),300);
+  setTimeout(()=>navOverlay.style.display='none',300);
 }
-
-fab.addEventListener('click',()=>open?closeNav():openNav());
+fab.addEventListener('click',()=>navOpen?closeNav():openNav());
 navOverlay.addEventListener('click',closeNav);
 orbs.forEach(o=>o.addEventListener('click',()=>navigate(o.dataset.screen)));
 
-// ── CLOCK & GREETING ──
+// CLOCK
 function updateClock(){
-  const now=new Date(),h=now.getHours(),m=now.getMinutes();
-  const t=`${h%12||12}:${m.toString().padStart(2,'0')}`;
+  const h=new Date().getHours();
   const g=h<12?'Good morning,':(h<17?'Good afternoon,':'Good evening,');
-  document.getElementById('greeting').textContent=g;
+  const el=document.getElementById('greeting');if(el)el.textContent=g;
 }
-updateClock();setInterval(updateClock,30000);
+updateClock();setInterval(updateClock,60000);
 
-// ── SAVE FLOW ──
-function openSave(){document.getElementById('saveBackdrop').classList.add('active');document.getElementById('saveSheet').classList.add('active');detectGPS()}
-function closeSave(){document.getElementById('saveBackdrop').classList.remove('active');document.getElementById('saveSheet').classList.remove('active')}
-function detectGPS(){
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>{
-      document.getElementById('gpsLocation').textContent=`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
-    },()=>{document.getElementById('gpsLocation').textContent='Location unavailable'})
-  } else {document.getElementById('gpsLocation').textContent='GPS not supported'}
+// SAVE
+function openSave(){
+  // Reset form
+  document.getElementById('inAddress').value='';
+  document.getElementById('inSpot').value='';
+  document.getElementById('inNotes').value='';
+  document.getElementById('inCost').value='';
+  document.getElementById('photoPreview').style.display='none';
+  document.getElementById('customTimer').style.display='none';
+  savedPhoto=null;
+  // Apply default timer from prefs
+  const prefs2=getPrefs();const defT=prefs2.defaultTimer||120;
+  const timerLabels={0:'None',30:'30 min',60:'1 hr',120:'2 hr',240:'4 hr'};
+  document.querySelectorAll('#timerOpts .s-opt').forEach(o=>{
+    const match=(o.textContent==='None'&&defT===0)||(o.textContent==='30 min'&&defT===30)||(o.textContent==='1 hr'&&defT===60)||(o.textContent==='2 hr'&&defT===120);
+    o.classList.toggle('active',match);
+  });
+  // Apply default notify timing
+  const defNotify=prefs2.defaultNotify!==undefined?prefs2.defaultNotify:15;
+  const notifyMap={0:'Off',5:'5 min',10:'10 min',15:'15 min',30:'30 min'};
+  const defNotifyTxt=notifyMap[defNotify]||'15 min';
+  document.querySelectorAll('#notifyOpts .s-opt').forEach(o=>{
+    o.classList.toggle('active',o.textContent===defNotifyTxt);
+  });
+  navigate('saveFlow');
+  detectGPS();
 }
-function pick(el,group){el.closest('.s-row').querySelectorAll('.s-opt').forEach(o=>o.classList.remove('active'));el.classList.add('active')}
+function closeSave(){navigate('home')}
+function detectGPS(){
+  const cityEl=document.getElementById('gpsCity');
+  const coordEl=document.getElementById('gpsCoords');
+  cityEl.textContent='Detecting...';coordEl.textContent='Getting GPS...';
+  if(!navigator.geolocation){cityEl.textContent='GPS unavailable';return}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=pos.coords.latitude,lng=pos.coords.longitude;
+    coordEl.textContent=lat.toFixed(5)+', '+lng.toFixed(5);
+    savedLat=lat;savedLng=lng;
+    fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lng+'&format=json')
+      .then(r=>r.json()).then(d=>{
+        const city=d.address?.city||d.address?.town||d.address?.village||d.address?.county||'';
+        const state=d.address?.state_code||'';
+        const road=d.address?.road||'';
+        cityEl.textContent=(city?city+(state?', '+state:''):'Location found');
+        const addrEl=document.getElementById('inAddress');
+        if(addrEl&&!addrEl.value) addrEl.value=road?(road+(city?', '+city:'')):(city||'');
+      }).catch(()=>{cityEl.textContent='Location found'});
+  },()=>{cityEl.textContent='Location unavailable';coordEl.textContent='Enter manually'});
+}
+let savedLat=null,savedLng=null;
+function pick(el,groupId){
+  document.getElementById(groupId).querySelectorAll('.s-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+}
 function fpick(el){el.closest('.filter-pills').querySelectorAll('.f-pill').forEach(p=>p.classList.remove('active'));el.classList.add('active')}
 function confirmSave(){
-  const spot=document.getElementById('inSpot').value.trim();
-  const addr=document.getElementById('inAddress').value.trim()||'Unknown location';
-  const payEl=document.querySelector('#payOpts .s-opt.active');
-  const pay=payEl?payEl.textContent:'Cash';
+  const addr=document.getElementById('inAddress').value.trim()||document.getElementById('gpsCity').textContent||'Unknown';
+  const pay=document.querySelector('#payOpts .s-opt.active')?.textContent||'Cash';
   const cost=parseFloat(document.getElementById('inCost').value)||0;
-  const timerEl=document.querySelector('#timerOpts .s-opt.active');
-  const timerTxt=timerEl?timerEl.textContent:'None';
+  const spot=document.getElementById('inSpot').value.trim();
   const notes=document.getElementById('inNotes').value.trim();
+  const timerTxt=document.querySelector('#timerOpts .s-opt.active')?.textContent||'None';
   let timerMins=0;
   if(timerTxt==='30 min')timerMins=30;
   else if(timerTxt==='1 hr')timerMins=60;
   else if(timerTxt==='2 hr')timerMins=120;
-  const session={id:Date.now(),location:addr,spot,payment:pay,cost,notes,timerMins,startTime:Date.now(),lat:null,lng:null};
-  if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{session.lat=p.coords.latitude;session.lng=p.coords.longitude;setActive(session);closeSave();refreshHome()},()=>{setActive(session);closeSave();refreshHome()})}
-  else{setActive(session);closeSave();refreshHome()}
-  const c=document.getElementById('saveCircle');c.style.background='#22C55E';setTimeout(()=>c.style.background='#0A0A0A',1200);
+  // Get notify timing from flow
+  const notifyEl=document.querySelector('#notifyOpts .s-opt.active');
+  const notifyTxt=notifyEl?notifyEl.textContent:'15 min';
+  let notifyBefore=15;
+  if(notifyTxt==='Off')notifyBefore=0;
+  else if(notifyTxt==='5 min')notifyBefore=5;
+  else if(notifyTxt==='10 min')notifyBefore=10;
+  else if(notifyTxt==='15 min')notifyBefore=15;
+  else if(notifyTxt==='30 min')notifyBefore=30;
+  const session={id:Date.now(),location:addr,spot,payment:pay,cost,notes,timerMins,notifyBefore,startTime:Date.now(),lat:savedLat,lng:savedLng,photo:savedPhoto};
+  setActive(session);firedWarnings=new Set();startMeterWatcher();refreshHome();
+  navigate('saveSuccess');
+  let cnt=3;
+  const cd=document.getElementById('successCountdown');
+  const t=setInterval(()=>{cnt--;if(cd)cd.textContent='Returning in '+cnt+'s...';if(cnt<=0){clearInterval(t);navigate('home')}},1000);
 }
 
-// ── HOME ──
+// HOME
 let timerInterval=null;
 function refreshHome(){
-  const active=getActive();
-  const sessions=getSessions();
+  const active=getActive(),sessions=getSessions();
   const rl=document.getElementById('recentList');
   const recent=sessions.slice(-3).reverse();
-  if(recent.length===0){rl.innerHTML='<p style="font-size:13px;color:rgba(0,0,0,.35);text-align:center;padding:20px 0">No sessions yet</p>'}
-  else{rl.innerHTML=recent.map(s=>`<div class="hist-row"><div class="hist-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="1.7" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:600;color:#0A0A0A;margin-bottom:3px">${s.location}</p><p style="font-size:12px;color:rgba(0,0,0,.38)">${fmtDate(s.startTime)} · ${fmtDur(s.duration||0)} · ${s.payment}</p></div><div style="text-align:right"><p style="font-size:14px;font-weight:700;color:#0A0A0A">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p></div></div>`).join('')}
+  rl.innerHTML=recent.length?recent.map(s=>`<div class="hist-row"><div class="hist-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="1.7" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div style="flex:1"><p style="font-size:14px;font-weight:600;color:#0A0A0A;margin-bottom:3px">${s.location}</p><p style="font-size:12px;color:rgba(0,0,0,.38)">${fmtDate(s.startTime)} · ${fmtDur(s.duration||0)} · ${s.payment}</p></div><p style="font-size:14px;font-weight:700;color:#0A0A0A">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p></div>`).join(''):'<p style="font-size:13px;color:rgba(0,0,0,.35);text-align:center;padding:20px 0">No sessions yet — save your first spot!</p>';
   if(active){
     document.getElementById('activeCard').style.display='block';
     document.getElementById('activeLocation').textContent=active.location;
-    document.getElementById('activeDetail').textContent=`${active.spot||'No spot noted'} · ${active.payment}`;
+    document.getElementById('activeDetail').textContent=(active.spot||'No spot noted')+' · '+active.payment;
     if(timerInterval)clearInterval(timerInterval);
-    timerInterval=setInterval(()=>tickTimer(active),1000);
-    tickTimer(active);
-  } else {
+    timerInterval=setInterval(()=>tickTimer(active),1000);tickTimer(active);
+  }else{
     document.getElementById('activeCard').style.display='none';
     if(timerInterval){clearInterval(timerInterval);timerInterval=null}
   }
 }
-function tickTimer(active){
-  const elapsed=Math.floor((Date.now()-active.startTime)/1000);
-  const m=Math.floor(elapsed/60),s=elapsed%60;
-  const tStr=`${m}:${s.toString().padStart(2,'0')}`;
-  document.getElementById('liveTimer').textContent=tStr;
-  if(document.getElementById('mapTimer'))document.getElementById('mapTimer').textContent=tStr;
-  const cost=active.cost>0?active.cost:0;
-  document.getElementById('liveCost').textContent='$'+cost.toFixed(2);
-  if(document.getElementById('mapCost'))document.getElementById('mapCost').textContent='$'+cost.toFixed(2);
-  if(active.timerMins>0){
-    const totalSecs=active.timerMins*60;
-    const remaining=totalSecs-elapsed;
-    if(remaining>0){
-      const rm=Math.floor(remaining/60),rs=remaining%60;
-      const mStr=`${rm}:${rs.toString().padStart(2,'0')}`;
-      document.getElementById('liveMeter').textContent=mStr;
-      if(document.getElementById('mapMeter'))document.getElementById('mapMeter').textContent=mStr;
-      document.getElementById('meterBar').style.width=(remaining/totalSecs*100)+'%';
-    } else {
-      document.getElementById('liveMeter').textContent='⚠ Expired';
-      if(document.getElementById('mapMeter'))document.getElementById('mapMeter').textContent='Expired';
-      document.getElementById('meterBar').style.width='0%';
-    }
-  } else {
-    document.getElementById('liveMeter').textContent='No meter';
-    if(document.getElementById('mapMeter'))document.getElementById('mapMeter').textContent='None';
-  }
-  const ago=Math.floor(elapsed/60);
-  document.getElementById('agoText').textContent=ago<1?'Just now':`${ago}m ago`;
+function tickTimer(a){
+  const el=Math.floor((Date.now()-a.startTime)/1000);
+  const m=Math.floor(el/60),s=el%60;
+  const ts=m+':'+s.toString().padStart(2,'0');
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  set('liveTimer',ts);set('mapTimer',ts);
+  set('liveCost','$'+(a.cost||0).toFixed(2));set('mapCost','$'+(a.cost||0).toFixed(2));
+  if(a.timerMins>0){
+    const rem=a.timerMins*60-el;
+    if(rem>0){const rm=Math.floor(rem/60),rs=rem%60;const ms=rm+':'+rs.toString().padStart(2,'0');set('liveMeter',ms);set('mapMeter',ms);const mb=document.getElementById('meterBar');if(mb)mb.style.width=(rem/(a.timerMins*60)*100)+'%';}
+    else{set('liveMeter','⚠ Expired');set('mapMeter','Expired');const mb=document.getElementById('meterBar');if(mb)mb.style.width='0%';}
+  }else{set('liveMeter','No meter');set('mapMeter','None')}
+  const ago=Math.floor(el/60);set('agoText',ago<1?'Just now':ago+'m ago');
 }
 function endSession(){
-  const active=getActive();
-  if(!active)return;
-  if(!confirm('End this parking session?'))return;
-  const elapsed=Math.floor((Date.now()-active.startTime)/1000);
-  active.duration=elapsed;active.endTime=Date.now();
-  const sessions=getSessions();sessions.push(active);saveSessions(sessions);
-  clearActive();if(timerInterval){clearInterval(timerInterval);timerInterval=null}
+  const a=getActive();if(!a||!confirm('End this session?'))return;
+  const el=Math.floor((Date.now()-a.startTime)/1000);
+  a.duration=el;a.endTime=Date.now();
+  const s=getSessions();s.push(a);saveSessions(s);clearActive();
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null}
   refreshHome();updateMapCard();
 }
 function navigateToCar(){
-  const active=getActive();
-  if(!active)return;
-  if(active.lat&&active.lng){window.open(`http://maps.google.com/maps?daddr=${active.lat},${active.lng}`)}
-  else{window.open(`http://maps.google.com/maps?q=${encodeURIComponent(active.location)}`)}
+  const a=getActive();if(!a)return;
+  window.open(a.lat&&a.lng?'http://maps.google.com/maps?daddr='+a.lat+','+a.lng:'http://maps.google.com/maps?q='+encodeURIComponent(a.location));
+}
+function showNotif(){
+  const a=getActive();
+  const r=document.getElementById('phone').getBoundingClientRect();
+  const old=document.getElementById('notifPop');if(old){old.remove();return}
+  const p=document.createElement('div');p.id='notifPop';
+  p.style.cssText='position:fixed;left:'+(r.left+16)+'px;top:'+(r.top+16)+'px;width:'+(r.width-32)+'px;background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:99999;font-family:Inter,sans-serif';
+  p.innerHTML=a?'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:700;color:#16A34A">● Active Session</span><span onclick="document.getElementById(\'notifPop\').remove()" style="cursor:pointer;color:rgba(0,0,0,.4);font-size:18px">✕</span></div><p style="font-size:15px;font-weight:700;color:#0A0A0A;margin-bottom:4px">'+a.location+'</p><p style="font-size:12px;color:rgba(0,0,0,.4)">'+( a.spot||'No spot')+'</p>':'<div style="display:flex;justify-content:space-between"><p style="font-size:14px;font-weight:600;color:#0A0A0A">No active session</p><span onclick="document.getElementById(\'notifPop\').remove()" style="cursor:pointer;color:rgba(0,0,0,.4)">✕</span></div>';
+  document.body.appendChild(p);
+  setTimeout(()=>{const pp=document.getElementById('notifPop');if(pp)pp.remove()},3500);
 }
 
-// ── HISTORY ──
-let histView='list';
+// HISTORY
+let calY=new Date().getFullYear(),calM=new Date().getMonth();
 function setView(v){
-  histView=v;
   document.getElementById('calView').style.display=v==='cal'?'block':'none';
   document.getElementById('histList').style.display=v==='list'?'block':'none';
   const vl=document.getElementById('vList'),vc=document.getElementById('vCal');
   if(v==='list'){vl.style.background='#0A0A0A';vl.querySelector('svg').style.stroke='white';vc.style.background='transparent';vc.querySelector('svg').style.stroke='rgba(0,0,0,0.4)'}
-  else{vc.style.background='#0A0A0A';vc.querySelector('svg').style.stroke='white';vl.style.background='transparent';vl.querySelector('svg').style.stroke='rgba(0,0,0,0.4)';buildCalendar()}
+  else{vc.style.background='#0A0A0A';vc.querySelector('svg').style.stroke='white';vl.style.background='transparent';vl.querySelector('svg').style.stroke='rgba(0,0,0,0.4)';buildCal()}
 }
-function buildCalendar(){
-  const sessions=getSessions();const active=getActive();
-  const now=new Date();const year=now.getFullYear();const month=now.getMonth();
-  document.getElementById('calMonthLabel').textContent=now.toLocaleString('default',{month:'long',year:'numeric'});
+function calPrev(){if(calM===0){calM=11;calY--}else calM--;buildCal()}
+function calNext(){if(calM===11){calM=0;calY++}else calM++;buildCal()}
+function buildCal(){
+  const sessions=getSessions(),active=getActive();
+  document.getElementById('calMonthLabel').textContent=new Date(calY,calM).toLocaleString('default',{month:'long',year:'numeric'});
   const grid=document.getElementById('calGrid');grid.innerHTML='';
-  const firstDay=new Date(year,month,1).getDay();const daysInMonth=new Date(year,month+1,0).getDate();
-  const parkedDays=new Set();
-  sessions.forEach(s=>{const d=new Date(s.startTime);if(d.getMonth()===month&&d.getFullYear()===year)parkedDays.add(d.getDate())});
-  if(active){const d=new Date(active.startTime);if(d.getMonth()===month&&d.getFullYear()===year)parkedDays.add(d.getDate())}
+  const firstDay=new Date(calY,calM,1).getDay(),days=new Date(calY,calM+1,0).getDate();
+  const now=new Date(),isNow=calY===now.getFullYear()&&calM===now.getMonth();
+  const pd=new Set();
+  getSessions().forEach(s=>{const d=new Date(s.startTime);if(d.getMonth()===calM&&d.getFullYear()===calY)pd.add(d.getDate())});
+  if(active){const d=new Date(active.startTime);if(d.getMonth()===calM&&d.getFullYear()===calY)pd.add(d.getDate())}
   for(let i=0;i<firstDay;i++){const e=document.createElement('div');e.style.height='34px';grid.appendChild(e)}
-  for(let d=1;d<=daysInMonth;d++){
-    const cell=document.createElement('div');const isToday=d===now.getDate();const isParked=parkedDays.has(d);
-    cell.style.cssText=`height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;${isToday?'background:#0A0A0A;':isParked?'background:rgba(0,0,0,0.06);':''}`;
-    const num=document.createElement('p');num.textContent=d;num.style.cssText=`font-size:13px;font-weight:${isToday||isParked?'700':'400'};color:${isToday?'#fff':'#0A0A0A'}`;
+  for(let d=1;d<=days;d++){
+    const cell=document.createElement('div'),isT=isNow&&d===now.getDate(),isP=pd.has(d);
+    cell.style.cssText='height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;'+(isT?'background:#0A0A0A;':isP?'background:rgba(0,0,0,0.06);':'');
+    const num=document.createElement('p');num.textContent=d;num.style.cssText='font-size:13px;font-weight:'+(isT||isP?'700':'400')+';color:'+(isT?'#fff':'#0A0A0A');
     cell.appendChild(num);
-    if(isParked&&!isToday){const dot=document.createElement('div');dot.style.cssText='width:4px;height:4px;background:#0A0A0A;border-radius:50%;margin-top:1px';cell.appendChild(dot)}
-    if(isToday&&active){const dot=document.createElement('div');dot.style.cssText='width:4px;height:4px;background:#22C55E;border-radius:50%;margin-top:1px';cell.appendChild(dot)}
+    if(isP&&!isT){const dot=document.createElement('div');dot.style.cssText='width:4px;height:4px;background:#0A0A0A;border-radius:50%;margin-top:1px';cell.appendChild(dot)}
+    if(isT&&active){const dot=document.createElement('div');dot.style.cssText='width:4px;height:4px;background:#22C55E;border-radius:50%;margin-top:1px';cell.appendChild(dot)}
     grid.appendChild(cell);
   }
 }
 function renderHistory(){
-  const sessions=getSessions().slice().reverse();const active=getActive();
-  const total=sessions.reduce((a,s)=>a+s.cost,0);
-  const totalHrs=sessions.reduce((a,s)=>a+(s.duration||0)/3600,0);
+  const sessions=getSessions().slice().reverse(),active=getActive();
+  const total=sessions.reduce((a,s)=>a+s.cost,0),hrs=sessions.reduce((a,s)=>a+(s.duration||0)/3600,0);
   document.getElementById('hSessions').textContent=sessions.length+(active?1:0);
-  document.getElementById('hHours').textContent=totalHrs.toFixed(1);
+  document.getElementById('hHours').textContent=hrs.toFixed(1);
   document.getElementById('hSpent').textContent='$'+total.toFixed(0);
   const hl=document.getElementById('histList');
   let html='';
-  if(active){html+=`<p style="font-size:11px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Active</p>${histCard(active,true)}`}
-  if(sessions.length===0&&!active){hl.innerHTML='<p style="font-size:13px;color:rgba(0,0,0,.35);text-align:center;padding:40px 0">No sessions yet</p>';return}
-  html+=sessions.map(s=>histCard(s,false)).join('');
+  if(active)html+='<p style="font-size:11px;font-weight:700;color:rgba(0,0,0,.3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">Active</p>'+hCard(active,true);
+  if(!sessions.length&&!active){hl.innerHTML='<p style="font-size:13px;color:rgba(0,0,0,.35);text-align:center;padding:40px 0">No sessions yet</p>';return}
+  html+=sessions.map(s=>hCard(s,false)).join('');
   hl.innerHTML=html;
   hl.querySelectorAll('.h-card').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('open')));
 }
-function histCard(s,isActive){
-  const badge=isActive?`<span style="font-size:9px;font-weight:700;color:#16A34A;background:rgba(34,197,94,.1);border:0.5px solid rgba(34,197,94,.25);border-radius:20px;padding:2px 7px;margin-left:6px">ACTIVE</span>`:(s.cost===0?`<span style="font-size:9px;color:rgba(0,0,0,.35)">Free</span>`:`<span style="font-size:9px;font-weight:600;color:#DC2626;background:rgba(239,68,68,.08);border:0.5px solid rgba(239,68,68,.2);border-radius:20px;padding:2px 7px">ENDED</span>`);
-  return`<div class="h-card${isActive?' active-card':''}"><div class="h-card-main"><div class="h-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="1.7" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div style="flex:1"><div style="display:flex;align-items:center;margin-bottom:3px"><p style="font-size:14px;font-weight:700;color:#0A0A0A">${s.location}</p>${badge}</div><p style="font-size:12px;color:rgba(0,0,0,.38)">${fmtDate(s.startTime)} · ${fmtDur(s.duration||0)} · ${s.payment}</p></div><div style="text-align:right"><p style="font-size:14px;font-weight:700;color:#0A0A0A;margin-bottom:4px">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p><svg class="h-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div></div><div class="h-expand"><div style="height:.5px;background:rgba(0,0,0,.07);margin:0 0 14px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:${s.notes?'10px':'0'}">${s.spot?`<div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px 12px"><p style="font-size:10px;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Spot</p><p style="font-size:13px;font-weight:600;color:#0A0A0A">${s.spot}</p></div>`:''}<div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px 12px"><p style="font-size:10px;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Payment</p><p style="font-size:13px;font-weight:600;color:#0A0A0A">${s.payment}</p></div><div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px 12px"><p style="font-size:10px;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Duration</p><p style="font-size:13px;font-weight:600;color:#0A0A0A">${fmtDur(s.duration||0)}</p></div><div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px 12px"><p style="font-size:10px;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Cost</p><p style="font-size:13px;font-weight:600;color:#0A0A0A">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p></div></div>${s.notes?`<p style="font-size:12px;color:rgba(0,0,0,.4);font-style:italic">${s.notes}</p>`:''}</div></div>`;
+function hCard(s,isA){
+  const badge=isA?'<span style="font-size:9px;font-weight:700;color:#16A34A;background:rgba(34,197,94,.1);border:0.5px solid rgba(34,197,94,.25);border-radius:20px;padding:2px 7px;margin-left:6px">ACTIVE</span>':s.cost===0?'<span style="font-size:9px;color:rgba(0,0,0,.35)">Free</span>':'<span style="font-size:9px;font-weight:600;color:#DC2626;background:rgba(239,68,68,.08);border:0.5px solid rgba(239,68,68,.2);border-radius:20px;padding:2px 7px">ENDED</span>';
+  return`<div class="h-card${isA?' active-card':''}"><div class="h-card-main"><div class="h-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="1.7" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div style="flex:1"><div style="display:flex;align-items:center;margin-bottom:3px"><p style="font-size:14px;font-weight:700;color:#0A0A0A">${s.location}</p>${badge}</div><p style="font-size:12px;color:rgba(0,0,0,.38)">${fmtDate(s.startTime)} · ${fmtDur(s.duration||0)} · ${s.payment}</p></div><div style="text-align:right;flex-shrink:0"><p style="font-size:14px;font-weight:700;color:#0A0A0A;margin-bottom:4px">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p><svg class="h-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div></div><div class="h-expand"><div style="height:.5px;background:rgba(0,0,0,.07);margin:0 0 14px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${s.spot?`<div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px 12px"><p style="font-size:10px;color:rgba(0,0,0,.35);text-transform:uppercase;margin-bottom:2px">Spot</p><p style="font-size:13px;font-weight:600;color:#0A0A0A">${s.spot}</p></div>`:''}<div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px 12px"><p style="font-size:10px;color:rgba(0,0,0,.35);text-transform:uppercase;margin-bottom:2px">Payment</p><p style="font-size:13px;font-weight:600;color:#0A0A0A">${s.payment}</p></div><div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px 12px"><p style="font-size:10px;color:rgba(0,0,0,.35);text-transform:uppercase;margin-bottom:2px">Duration</p><p style="font-size:13px;font-weight:600;color:#0A0A0A">${fmtDur(s.duration||0)}</p></div><div style="background:rgba(0,0,0,.04);border-radius:10px;padding:10px 12px"><p style="font-size:10px;color:rgba(0,0,0,.35);text-transform:uppercase;margin-bottom:2px">Cost</p><p style="font-size:13px;font-weight:600;color:#0A0A0A">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p></div></div>${s.notes?`<p style="font-size:12px;color:rgba(0,0,0,.4);font-style:italic;margin-top:10px">${s.notes}</p>`:''}</div></div>`;
 }
 function openHistFilter(){document.getElementById('histFilterBackdrop').classList.add('active');document.getElementById('histFilterSheet').classList.add('active')}
 function closeHistFilter(){document.getElementById('histFilterBackdrop').classList.remove('active');document.getElementById('histFilterSheet').classList.remove('active')}
-function resetHistFilter(){document.querySelectorAll('#histFilterSheet .filter-pills').forEach(g=>{g.querySelectorAll('.f-pill').forEach((p,i)=>i===0?p.classList.add('active'):p.classList.remove('active'))})}
+function resetHistFilter(){document.querySelectorAll('#histFilterSheet .filter-pills').forEach(g=>g.querySelectorAll('.f-pill').forEach((p,i)=>i===0?p.classList.add('active'):p.classList.remove('active')))}
 function applyHistFilter(){closeHistFilter();renderHistory()}
 
-// ── SPEND ──
-let currentPeriod='week';
+// SPEND
 function renderSpend(period){
-  currentPeriod=period;
-  const allSessions=getSessions();const active=getActive();
-  const now=Date.now();
-  let filtered=allSessions;
-  if(period==='week')filtered=allSessions.filter(s=>now-s.startTime<7*86400000);
-  else if(period==='month')filtered=allSessions.filter(s=>now-s.startTime<30*86400000);
-  const total=filtered.reduce((a,s)=>a+s.cost,0);
-  const avg=filtered.length?total/filtered.length:0;
+  const all=getSessions(),now=Date.now();
+  let f=all;
+  if(period==='week')f=all.filter(s=>now-s.startTime<7*864e5);
+  else if(period==='month')f=all.filter(s=>now-s.startTime<30*864e5);
+  const total=f.reduce((a,s)=>a+s.cost,0),avg=f.length?total/f.length:0;
   document.getElementById('spendTotal').textContent='$'+total.toFixed(2);
   document.getElementById('spendAvg').textContent='$'+avg.toFixed(2);
-  document.getElementById('spendCount').textContent=filtered.length+' sessions';
-  const locCount={};filtered.forEach(s=>{locCount[s.location]=(locCount[s.location]||0)+1});
-  const top=Object.entries(locCount).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('spendCount').textContent=f.length+' sessions';
+  const lc={};f.forEach(s=>{lc[s.location]=(lc[s.location]||0)+1});
+  const top=Object.entries(lc).sort((a,b)=>b[1]-a[1])[0];
   document.getElementById('spendMost').textContent=top?top[0].split(' ').slice(0,2).join(' '):'—';
   document.getElementById('spendMostCount').textContent=top?top[1]+' visits':'';
-  const half=period==='week'?7*86400000/2:period==='month'?15*86400000:Infinity;
-  const recent2=allSessions.filter(s=>now-s.startTime<half).reduce((a,s)=>a+s.cost,0);
-  const older=allSessions.filter(s=>now-s.startTime>=half&&now-s.startTime<(half*2)).reduce((a,s)=>a+s.cost,0);
-  const diff=recent2-older;const up=diff<=0;
-  document.getElementById('trendTxt').textContent=`$${Math.abs(diff).toFixed(2)} ${up?'less':'more'}`;
-  document.getElementById('trendArrow').setAttribute('points',up?'18 15 12 9 6 15':'6 9 12 15 18 9');
-  document.getElementById('trendTxt').style.color=up?'#16A34A':'#DC2626';
-  document.getElementById('trendBadge').style.background=up?'rgba(34,197,94,.1)':'rgba(239,68,68,.08)';
-  const labels={week:['Mon','Today'],month:['Jun 1','Today'],all:['Start','Today']};
+  const labels={week:['Mon','Today'],month:['30d ago','Today'],all:['Start','Today']};
   document.getElementById('sStart').textContent=labels[period][0];
   document.getElementById('sEnd').textContent=labels[period][1];
-  const pays={Cash:0,Card:0,App:0};filtered.forEach(s=>{if(pays[s.payment]!==undefined)pays[s.payment]+=s.cost});
-  const payTotal=Object.values(pays).reduce((a,b)=>a+b,0)||1;
-  document.getElementById('payBreakdown').innerHTML=Object.entries(pays).map(([k,v])=>`
-    <div style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-size:13px;font-weight:600;color:#0A0A0A">${k}</span>
-        <div><span style="font-size:13px;font-weight:700;color:#0A0A0A">$${v.toFixed(2)}</span><span style="font-size:11px;color:rgba(0,0,0,.35);margin-left:6px">${Math.round(v/payTotal*100)}%</span></div>
-      </div>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/payTotal*100)}%"></div></div>
-    </div>`).join('');
-  const txns=filtered.slice().reverse().slice(0,5);
-  document.getElementById('txnList').innerHTML=txns.length?txns.map(s=>`<div class="txn-row"><div class="txn-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.45)" stroke-width="1.7" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div style="flex:1"><p style="font-size:13px;font-weight:600;color:#0A0A0A;margin-bottom:2px">${s.location}</p><p style="font-size:11px;color:rgba(0,0,0,.38)">${fmtDate(s.startTime)} · ${s.payment}</p></div><p style="font-size:14px;font-weight:700;color:#0A0A0A">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p></div>`).join(''):'<p style="font-size:13px;color:rgba(0,0,0,.35);text-align:center;padding:20px 0">No transactions yet</p>';
+  const pays={Cash:0,Card:0,App:0};f.forEach(s=>{if(s.payment in pays)pays[s.payment]+=s.cost});
+  const pt=Object.values(pays).reduce((a,b)=>a+b,0)||1;
+  document.getElementById('payBreakdown').innerHTML=Object.entries(pays).map(([k,v])=>`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600;color:#0A0A0A">${k}</span><span style="font-size:13px;font-weight:700;color:#0A0A0A">$${v.toFixed(2)} <span style="font-size:11px;color:rgba(0,0,0,.35)">${Math.round(v/pt*100)}%</span></span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/pt*100)}%"></div></div></div>`).join('');
+  const txns=f.slice().sort((a,b)=>b.startTime-a.startTime).slice(0,5);
+  document.getElementById('txnList').innerHTML=txns.length?txns.map(s=>`<div class="txn-row"><div class="txn-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="1.7" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div style="flex:1"><p style="font-size:13px;font-weight:600;color:#0A0A0A;margin-bottom:2px">${s.location}</p><p style="font-size:11px;color:rgba(0,0,0,.38)">${fmtDate(s.startTime)} · ${s.payment}</p></div><p style="font-size:14px;font-weight:700;color:#0A0A0A">${s.cost>0?'$'+s.cost.toFixed(2):'Free'}</p></div>`).join(''):'<p style="font-size:13px;color:rgba(0,0,0,.35);text-align:center;padding:20px 0">No transactions yet</p>';
 }
 function setPeriod(el,p){document.querySelectorAll('.period-pill').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderSpend(p)}
 function openSpendFilter(){document.getElementById('spendFilterBackdrop').classList.add('active');document.getElementById('spendFilterSheet').classList.add('active')}
 function closeSpendFilter(){document.getElementById('spendFilterBackdrop').classList.remove('active');document.getElementById('spendFilterSheet').classList.remove('active')}
-function resetSpendFilter(){document.querySelectorAll('#spendFilterSheet .filter-pills').forEach(g=>{g.querySelectorAll('.f-pill').forEach((p,i)=>i===0?p.classList.add('active'):p.classList.remove('active'))})}
+function resetSpendFilter(){document.querySelectorAll('#spendFilterSheet .filter-pills').forEach(g=>g.querySelectorAll('.f-pill').forEach((p,i)=>i===0?p.classList.add('active'):p.classList.remove('active')))}
 
-// ── MAP ──
+// MAP
 let mapInstance=null;
 function initMap(){
   if(mapInstance)return;
-  const active=getActive();
-  const lat=active&&active.lat?active.lat:38.9209;
-  const lng=active&&active.lng?active.lng:-77.2285;
+  const a=getActive(),lat=a?.lat||38.9209,lng=a?.lng||-77.2285;
   try{
     mapInstance=L.map('leaflet-map',{center:[lat,lng],zoom:17,zoomControl:false,attributionControl:false});
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(mapInstance);
-    if(active){
-      const pin=L.divIcon({html:`<div style="width:44px;height:44px;background:#0A0A0A;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center"><div style="transform:rotate(45deg);color:#fff;font-weight:900;font-size:16px;font-family:Inter,sans-serif;margin-top:-2px;margin-left:1px">P</div></div>`,iconSize:[44,44],iconAnchor:[22,44],className:''});
-      L.marker([lat,lng],{icon:pin}).addTo(mapInstance);
-      L.circle([lat,lng],{radius:30,color:'#0A0A0A',fillColor:'#0A0A0A',fillOpacity:.08,weight:1,opacity:.2}).addTo(mapInstance);
+    if(a?.lat){
+      const pin=L.divIcon({html:'<div style="width:44px;height:44px;background:#0A0A0A;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center"><div style="transform:rotate(45deg);color:#fff;font-weight:900;font-size:16px;font-family:Inter,sans-serif">P</div></div>',iconSize:[44,44],iconAnchor:[22,44],className:''});
+      L.marker([a.lat,a.lng],{icon:pin}).addTo(mapInstance);
+      L.circle([a.lat,a.lng],{radius:30,color:'#0A0A0A',fillColor:'#0A0A0A',fillOpacity:.08,weight:1,opacity:.2}).addTo(mapInstance);
     }
-  }catch(e){document.getElementById('leaflet-map').innerHTML='<div style="width:100%;height:100%;background:#E8ECF0;display:flex;align-items:center;justify-content:center"><p style="color:rgba(0,0,0,.3);font-size:14px">Map unavailable</p></div>'}
+  }catch(e){}
 }
-function recenterMap(){
-  const active=getActive();
-  if(mapInstance&&active&&active.lat)mapInstance.flyTo([active.lat,active.lng],17,{duration:.8});
-}
+function recenterMap(){const a=getActive();if(mapInstance&&a?.lat)mapInstance.flyTo([a.lat,a.lng],17,{duration:.8})}
 function updateMapCard(){
-  const active=getActive();
-  document.getElementById('mapNoSession').style.display=active?'none':'block';
-  document.getElementById('mapSession').style.display=active?'block':'none';
-  if(active){
-    document.getElementById('mapLocName').textContent=active.location;
-    document.getElementById('mapLocDetail').textContent=active.spot||'No spot noted';
-    document.getElementById('mapName').textContent=active.location;
-    document.getElementById('mapDetail').textContent=active.spot||'';
-    document.getElementById('mapSpot').textContent=active.spot||'—';
+  const a=getActive();
+  document.getElementById('mapNoSession').style.display=a?'none':'block';
+  document.getElementById('mapSession').style.display=a?'block':'none';
+  if(a){
+    document.getElementById('mapLocName').textContent=a.location;
+    document.getElementById('mapLocDetail').textContent=a.spot||'No spot noted';
+    document.getElementById('mapName').textContent=a.location;
+    document.getElementById('mapDetail').textContent=a.spot||'';
+    document.getElementById('mapSpot').textContent=a.spot||'—';
   }
 }
 
-// ── SETTINGS ──
+
+// PROFILE
+let pickedColor='#0A0A0A';
+function pickColor(el,color){
+  pickedColor=color;
+  document.getElementById('colorPicker').querySelectorAll('div').forEach(d=>d.style.border='3px solid transparent');
+  el.style.border='3px solid #000';
+  document.getElementById('peAvatar').style.background=color;
+}
+function saveProfile(){
+  const p=getPrefs();
+  p.name=document.getElementById('peName').value.trim()||'User';
+  p.init=document.getElementById('peInit').value.toUpperCase().slice(0,1)||'N';
+  p.color=pickedColor;
+  savePrefs(p);
+  document.getElementById('profileName').textContent=p.name;
+  document.getElementById('avatarLetter').textContent=p.init;
+  document.getElementById('avatarCircle').style.background=p.color;
+  navigate('settings');
+}
+function initProfileEdit(){
+  const p=getPrefs();
+  document.getElementById('peName').value=p.name||'';
+  document.getElementById('peInit').value=p.init||'N';
+  document.getElementById('peAvatar').textContent=p.init||'N';
+  document.getElementById('peAvatar').style.background=p.color||'#0A0A0A';
+  pickedColor=p.color||'#0A0A0A';
+}
+function togglePref(el,key){
+  if(key==='notif'){
+    // Special handling: request permission if turning on
+    const isOn=el.classList.contains('off'); // currently off, user wants on
+    if(isOn){
+      requestNotifPermission(el);
+    } else {
+      el.classList.add('off');
+      const p=getPrefs();p.notif=false;savePrefs(p);
+    }
+    return;
+  }
+  el.classList.toggle('off');
+  const p=getPrefs();p[key]=!el.classList.contains('off');savePrefs(p);
+}
+// IMPORT
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.sessions&&Array.isArray(data.sessions)){
+        const existing=getSessions();
+        const ids=new Set(existing.map(s=>s.id));
+        const newS=data.sessions.filter(s=>!ids.has(s.id));
+        saveSessions([...existing,...newS]);
+        document.getElementById('importStatus').textContent='✓ Imported '+newS.length+' sessions';
+      }else document.getElementById('importStatus').textContent='⚠ Invalid file';
+    }catch{document.getElementById('importStatus').textContent='⚠ Could not read file'}
+  };
+  reader.readAsText(file);
+}
+// PHOTO
+let savedPhoto=null;
+function handlePhoto(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    savedPhoto=e.target.result;
+    const prev=document.getElementById('photoPreview');
+    prev.src=savedPhoto;prev.style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+function pickTimer(el){
+  document.getElementById('timerOpts').querySelectorAll('.s-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('customTimer').style.display=el.textContent==='Custom'?'block':'none';
+}
+// AI CHAT
+async function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const msg=inp.value.trim();if(!msg)return;
+  inp.value='';
+  const msgs=document.getElementById('chatMsgs');
+  msgs.innerHTML+=`<div style="max-width:80%;padding:12px 16px;background:#0A0A0A;border-radius:18px;border-bottom-right-radius:4px;font-size:14px;color:#fff;line-height:1.5;align-self:flex-end">${msg}</div>`;
+  const typing=document.createElement('div');
+  typing.style.cssText='max-width:80%;padding:12px 16px;background:rgba(255,255,255,.9);border:0.5px solid rgba(255,255,255,.98);border-radius:18px;border-bottom-left-radius:4px;align-self:flex-start';
+  typing.innerHTML='<div style="display:flex;gap:4px;align-items:center"><span style="width:6px;height:6px;background:rgba(0,0,0,.3);border-radius:50%;animation:gp 1.2s infinite"></span><span style="width:6px;height:6px;background:rgba(0,0,0,.3);border-radius:50%;animation:gp 1.2s .2s infinite"></span><span style="width:6px;height:6px;background:rgba(0,0,0,.3);border-radius:50%;animation:gp 1.2s .4s infinite"></span></div>';
+  msgs.appendChild(typing);msgs.scrollTop=msgs.scrollHeight;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,
+        system:'You are Parky\'s friendly in-app support assistant. Parky is a parking spot saving app with: Home (save spot button, active session card), History (list & calendar view), Spend (spending analytics), Map (GPS pin of parked spot), Settings (profile, theme, data export/import). Help users with saving spots, GPS, timers, navigation, history, and settings. Be concise and warm. Max 2-3 sentences.',
+        messages:[{role:'user',content:msg}]})
+    });
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'Sorry, try again!';
+    typing.remove();
+    msgs.innerHTML+=`<div style="max-width:80%;padding:12px 16px;background:rgba(255,255,255,.9);border:0.5px solid rgba(255,255,255,.98);border-radius:18px;border-bottom-left-radius:4px;font-size:14px;color:#0A0A0A;line-height:1.5;align-self:flex-start">${reply}</div>`;
+  }catch{
+    typing.remove();
+    msgs.innerHTML+=`<div style="max-width:80%;padding:12px 16px;background:rgba(255,255,255,.9);border:0.5px solid rgba(255,255,255,.98);border-radius:18px;border-bottom-left-radius:4px;font-size:14px;color:#0A0A0A;line-height:1.5;align-self:flex-start">Having trouble connecting. Email us at support@parky.app</div>`;
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+}
+// TIMER SHEET
+function openTimerSheet(){
+  document.getElementById('timerSheetBd').style.display='block';
+  document.getElementById('timerSheet').classList.add('active');
+  // Check current saved timer
+  const p=getPrefs();const val=p.defaultTimer||120;
+  document.querySelectorAll('.timer-opt-row').forEach(row=>{
+    const check=row.querySelector('.timer-check');
+    check.style.display=parseInt(row.dataset.val)===val?'block':'none';
+  });
+}
+function closeTimerSheet(){
+  document.getElementById('timerSheetBd').style.display='none';
+  document.getElementById('timerSheet').classList.remove('active');
+}
+function openNotifySheet(){
+  document.getElementById('notifySheetBd').style.display='block';
+  document.getElementById('notifySheet').classList.add('active');
+  const p=getPrefs();const val=p.defaultNotify!==undefined?p.defaultNotify:15;
+  document.querySelectorAll('#notifyOptions .timer-opt-row').forEach(row=>{
+    row.querySelector('.notify-check').style.display=parseInt(row.dataset.val)===val?'block':'none';
+  });
+}
+function closeNotifySheet(){
+  document.getElementById('notifySheetBd').style.display='none';
+  document.getElementById('notifySheet').classList.remove('active');
+}
+function setDefaultNotify(val,label){
+  const p=getPrefs();p.defaultNotify=val;savePrefs(p);
+  const el=document.getElementById('defNotifyLbl');
+  if(el)el.textContent=val===0?'Off':label+' before';
+  document.querySelectorAll('#notifyOptions .timer-opt-row').forEach(row=>{
+    row.querySelector('.notify-check').style.display=parseInt(row.dataset.val)===val?'block':'none';
+  });
+  setTimeout(closeNotifySheet,300);
+}
+function setDefaultTimer(val,label){
+  const p=getPrefs();p.defaultTimer=val;savePrefs(p);
+  document.getElementById('defTimerLbl').textContent=label;
+  document.querySelectorAll('.timer-opt-row').forEach(row=>{
+    row.querySelector('.timer-check').style.display=parseInt(row.dataset.val)===val?'block':'none';
+  });
+  setTimeout(closeTimerSheet,300);
+}
+
+// NOTIFICATIONS - real browser notifications + in-app meter warning
+function requestNotifPermission(el){
+  if(!('Notification' in window)){
+    el.classList.add('off');
+    showToast('Notifications not supported on this device');
+    return;
+  }
+  if(Notification.permission==='granted'){
+    // already granted, toggle off
+    const p=getPrefs();p.notif=false;savePrefs(p);
+    el.classList.add('off');
+    return;
+  }
+  Notification.requestPermission().then(perm=>{
+    const p=getPrefs();
+    if(perm==='granted'){
+      p.notif=true;savePrefs(p);
+      el.classList.remove('off');
+      showToast('Notifications enabled!');
+    } else {
+      p.notif=false;savePrefs(p);
+      el.classList.add('off');
+      showToast('Notifications blocked. Enable in browser settings.');
+    }
+  });
+}
+
+function sendNotification(title,body){
+  const p=getPrefs();
+  // Always show in-app banner
+  const banner=document.getElementById('meterBanner');
+  document.getElementById('bannerTitle').textContent=title;
+  document.getElementById('bannerSub').textContent=body;
+  banner.style.display='block';
+  setTimeout(()=>banner.style.display='none',5000);
+  // Also send browser notification if permitted
+  if(p.notif&&'Notification' in window&&Notification.permission==='granted'){
+    new Notification(title,{body,icon:'/icon-512.png',badge:'/icon-512.png'});
+  }
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#0A0A0A;color:#fff;padding:10px 20px;border-radius:100px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;z-index:99999;white-space:nowrap;opacity:1;transition:opacity .3s';
+  t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},2500);
+}
+
+// CAMERA - enhanced
+function openCamera(){document.getElementById('cameraInput').click()}
+function openGallery(){document.getElementById('photoUpload').click()}
+
+// METER NOTIFICATION WATCHER
+let notifWatcher=null;
+let firedWarnings=new Set();
+function startMeterWatcher(){
+  if(notifWatcher)clearInterval(notifWatcher);
+  firedWarnings=new Set();
+  notifWatcher=setInterval(()=>{
+    const a=getActive();if(!a||!a.timerMins)return;
+    const elapsed=Math.floor((Date.now()-a.startTime)/1000);
+    const remaining=Math.floor(a.timerMins*60-elapsed);
+    const p=getPrefs();
+    // Per-session notifyBefore (set during save), falls back to default pref
+    const warnMins=a.notifyBefore!==undefined?a.notifyBefore:(p.defaultNotify!==undefined?p.defaultNotify:15);
+    const warnSecs=warnMins*60;
+    // Warning at user's chosen time
+    if(warnMins>0&&remaining===warnSecs&&!firedWarnings.has('warn')){
+      firedWarnings.add('warn');
+      sendNotification('Meter expiring soon',warnMins+' min left at '+a.location);
+    }
+    // Always fire at 1 min if not already done
+    if(remaining===60&&!firedWarnings.has('1min')){
+      firedWarnings.add('1min');
+      sendNotification('1 minute left!','Move your car at '+a.location);
+    }
+    // Expired
+    if(remaining<=0&&!firedWarnings.has('expired')){
+      firedWarnings.add('expired');
+      sendNotification('Meter expired!','Time is up at '+a.location);
+    }
+  },1000);
+}
+startMeterWatcher();
+
+// SETTINGS
 function updateSettings(){
-  const sessions=getSessions();const active=getActive();
-  document.getElementById('sessionCountLabel').textContent=(sessions.length+(active?1:0))+' sessions';
-  const prefs=getPrefs();
-  document.querySelectorAll('.theme-opt').forEach((o,i)=>{o.classList.toggle('active',(i===0&&prefs.theme==='light')||(i===1&&prefs.theme==='dark'))});
+  const s=getSessions(),a=getActive(),p=getPrefs();
+  document.getElementById('sessionCountLabel').textContent=(s.length+(a?1:0))+' sessions';
+  document.querySelectorAll('.theme-opt').forEach((o,i)=>o.classList.toggle('active',(i===0&&p.theme!=='dark')||(i===1&&p.theme==='dark')));
+  if(p.name)document.getElementById('profileName').textContent=p.name;
+  const al=document.getElementById('avatarLetter');if(al&&p.init)al.textContent=p.init;
+  const ac=document.getElementById('avatarCircle');if(ac&&p.color)ac.style.background=p.color;
+  // Restore toggles
+  const nt=document.getElementById('notifToggle');
+  if(nt)nt.classList.toggle('off',!p.notif&&Notification.permission!=='granted');
+  const lt=document.getElementById('locToggle');
+  if(lt)lt.classList.toggle('off',p.loc===false);
+  // Default timer label
+  const dtl=document.getElementById('defTimerLbl');
+  if(dtl){
+    const labels={0:'None',30:'30 min',60:'1 hour',120:'2 hours',240:'4 hours'};
+    dtl.textContent=labels[p.defaultTimer||120]||'2 hours';
+  }
+  const dnl=document.getElementById('defNotifyLbl');
+  if(dnl){
+    const defN=p.defaultNotify!==undefined?p.defaultNotify:15;
+    const nlabels={0:'Off',5:'5 min before',10:'10 min before',15:'15 min before',30:'30 min before'};
+    dnl.textContent=nlabels[defN]||'15 min before';
+  }
 }
 function setTheme(t){
-  const prefs=getPrefs();prefs.theme=t;savePrefs(prefs);
+  const p=getPrefs();p.theme=t;savePrefs(p);
   document.body.classList.toggle('dark',t==='dark');
-  document.querySelectorAll('.theme-opt').forEach((o,i)=>o.classList.toggle('active',(i===0&&t==='light')||(i===1&&t==='dark')));
+  document.querySelectorAll('.theme-opt').forEach((o,i)=>o.classList.toggle('active',(i===0&&t!=='dark')||(i===1&&t==='dark')));
 }
-function toggleSwitch(el){el.classList.toggle('off')}
+function exportData(){
+  const blob=new Blob([JSON.stringify({sessions:getSessions(),active:getActive(),exported:new Date().toISOString()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='parky-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+}
 function clearAllData(){
-  if(confirm('Delete all sessions? This cannot be undone.')){
-    localStorage.removeItem('parky_sessions');clearActive();
-    if(timerInterval){clearInterval(timerInterval);timerInterval=null}
-    refreshHome();alert('All data cleared.');
-  }
+  if(!confirm('Delete all data? Cannot be undone.'))return;
+  localStorage.removeItem('parky_s');clearActive();
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null}
+  refreshHome();
 }
 
-// ── UTILS ──
-function fmtDate(ts){const d=new Date(ts),now=new Date();const diff=(now-d)/86400000;if(diff<1)return'Today';if(diff<2)return'Yesterday';return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}
-function fmtDur(secs){if(!secs)return'Active';const h=Math.floor(secs/3600),m=Math.floor((secs%3600)/60);return h>0?`${h}h ${m}m`:`${m}m`}
+// UTILS
+function fmtDate(ts){const d=new Date(ts),now=new Date(),diff=(now-d)/864e5;return diff<1?'Today':diff<2?'Yesterday':d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}
+function fmtDur(s){if(!s)return'Active';const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h>0?h+'h '+m+'m':m+'m'}
 
-// ── INIT ──
+// INIT
 const prefs=getPrefs();
 if(prefs.theme==='dark')document.body.classList.add('dark');
+// Apply saved profile on load
+if(prefs.name){const pn=document.getElementById('profileName');if(pn)pn.textContent=prefs.name;}
+if(prefs.init){const al=document.getElementById('avatarLetter');if(al)al.textContent=prefs.init;}
+if(prefs.color){const ac=document.getElementById('avatarCircle');if(ac)ac.style.background=prefs.color;}
 refreshHome();
-const existingActive=getActive();
-if(existingActive&&!timerInterval){timerInterval=setInterval(()=>tickTimer(existingActive),1000);tickTimer(existingActive)}
+const ea=getActive();
+if(ea&&!timerInterval){timerInterval=setInterval(()=>tickTimer(ea),1000);tickTimer(ea)}
 </script>
 </body>
 </html>
